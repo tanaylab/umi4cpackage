@@ -39,8 +39,8 @@ p4cNewProfile <- function(track_nm, bait_chrom = gtrack.attr.get(track_nm[1], "B
     }
     
     p4c_obj <- list(track_nm = paste(track_nm, collapse = " "), bait = list(chrom = bait_chrom, 
-        start = as.numeric(bait_start), bait_pad = as.numeric(getOption("TG3C.bait_pad")), 
-        scope = c(scope_5, scope_3)))
+        start = as.numeric(bait_start), bait_pad = as.numeric(getOption("TG3C.bait_pad"))), 
+        scope = c(scope_5, scope_3))
     
     class(p4c_obj) <- "p4cProfile"
     names(p4c_obj$scope) <- c("scope_5", "scope_3")
@@ -274,7 +274,7 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NA, trend_scale = "adapt
     } 
     
     # add y axis
-    axis(2, las = 1, cex.axis = 1.3)
+    axis(2, las = 1, cex.axis = 1)
     
     omitted_idx <- attr(coords, "na.action")
     
@@ -332,7 +332,7 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NA, trend_scale = "adapt
     shades <- colorRampPalette(p4c_obj$graphics_params$shades)(1000)
     
     image(x = coords, z = pmin(dgram[, n:3], p4c_obj$graphics_params$zlim[2]), col = shades, 
-        xlab = sprintf("chrom %s coordinate (Mb)", gsub("chr", "", p4c_obj$bait$chrom)), 
+        xlab = sprintf("chrom %s coordinates (Mb)", gsub("chr", "", p4c_obj$bait$chrom)), 
         zlim = p4c_obj$graphics_params$zlim, xlim = c(horiz5, horiz3), cex.lab = 1.2, 
         yaxt = "n", xaxt = "n")
     
@@ -341,9 +341,9 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NA, trend_scale = "adapt
         horiz3, l = 9)/1e+06, 2), cex.lab = 2, cex.axis = 1.4)
     
     scales_l <- length(p4c_obj$dgram_params$dgram_scales)
-    axis(2, seq(0, 1, l = 3), labels = c(p4c_obj$dgram_params$dgram_scales[scales_l], 
-        p4c_obj$dgram_params$dgram_scales[scales_l/2], p4c_obj$dgram_params$dgram_scales[1]), 
-        las = 1, cex.axis = 1.3)
+    axis(2, c(0, 0.5), labels = c(p4c_obj$dgram_params$dgram_scales[scales_l], 
+        p4c_obj$dgram_params$dgram_scales[scales_l/2]), 
+        las = 1, cex.axis = 1)
     
     # mask missing re in dgram
     sapply(missing_re_idx, function(i) polygon(c(coords_fends[i] - 10000, coords_fends[i], 
@@ -1175,8 +1175,8 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 30, color = "blac
 
 .p4cSetDgramParams <- function(p4c_obj, re_seq, map_thresh, min_flen, scales, stat_type) UseMethod(".p4cSetDgramParams")
 
-.p4cSetDgramParams.p4cProfile <- function(p4c_obj, re_seq = get_param("TG3C.RE_seq", 
-    params), map_thresh = getOption("TG3C.map_thresh"), min_flen = getOption("TG3C.min_flen"), 
+.p4cSetDgramParams.p4cProfile <- function(p4c_obj, re_seq = getOption("TG3C.RE_seq"), 
+    map_thresh = getOption("TG3C.map_thresh"), min_flen = getOption("TG3C.min_flen"), 
     scales = getOption("TG3C.dgram_scales"), stat_type = getOption("TG3C.stat_type"))
     {
     l <- list(re_seq = re_seq, map_thresh = as.numeric(map_thresh), min_flen = as.numeric(min_flen), 

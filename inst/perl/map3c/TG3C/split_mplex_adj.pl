@@ -10,34 +10,31 @@ require map3c::ConfOpt;
 require map3c::ReDB;
 require map3c::TG3C::BaitsTab4C;
 require map3c::TG3C::SamplesTab4C;
-my $pipeline_home = realpath("$FindBin::Bin/../../..");
 
 if (scalar @ARGV < 4) {
-    die "usage $0 --adj <adj> --conf_file <conf_file> --sample_id <samples_id> --redb_dir <> --re_seq <> --log_file <>\n";
+    die "usage $0 --adj <adj> --samples_tab <tab> --baits_tab <tab> --sample_id <samples_id> --redb_dir <> --re_seq <> --log_file <>\n";
 }
 
-my ( $conf_file, $adj_fn, $sample_id, $redb_dir, $re_seq);
+my ($conf_file, $adj_fn, $sample_id, $redb_dir, $re_seq, $bait_tab_fn, $samp_tab_fn);
 my $log_file = undef;
-GetOptions("conf_file=s" => \$conf_file,
+GetOptions(
+           "baits_tab=s" => \$bait_tab_fn,
+           "samples_tab=s" => \$samp_tab_fn,
            "adj=s"       => \$adj_fn,
            "sample_id=i" => \$sample_id,
            "redb_dir=s"  => \$redb_dir,
            "log_file=s"  => \$log_file,
-           "re_seq=s"    => \$re_seq)
+           "re_seq=s"    => \$re_seq
+           )
 	or die "not all args supplied\n";
 
 print STDERR "adj_fn = $adj_fn\n";
 my $redb = ReDB::new("ReDB");
 $redb->init_from_tabs($redb_dir."/$re_seq.frags");
 
-my($opt) = ConfOpt::new("ConfOpt");
-$opt->read_conf($conf_file);
-
-my($bait_tab_fn)  = "$pipeline_home/" . $opt->get_opt("TG3C.baits_tab");
 my($baits) = TG3C::BaitsTab4C::new("TG3C::BaitsTab4C");
 $baits->read_tab($bait_tab_fn);
 
-my($samp_tab_fn)  = "$pipeline_home/" . $opt->get_opt("TG3C.samples_tab");
 my($samps) = TG3C::SamplesTab4C::new("TG3C::SamplesTab4C");
 $samps->read_tab($samp_tab_fn);
 

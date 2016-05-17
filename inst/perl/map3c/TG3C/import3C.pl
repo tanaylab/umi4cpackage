@@ -7,7 +7,7 @@ require map3c::ConfOpt;
 require map3c::TG3C::BaitsTab4C;
 require map3c::TG3C::SamplesTab4C;
 
-#valid configuration option names
+# valida configuration option names
 
 my ($opt) = ConfOpt::new("ConfOpt");
 
@@ -16,8 +16,9 @@ $opt->parse_argv_conf( \@ARGV );
 my ($done) = "";
 my ($ret)  = 0;
 
-#========================
-#Construct working directory
+############################
+# Construct workdir
+############################
 my $dir_lscripts = $opt->get_opt("TG3C.perl_scripts_path") . "/map3c/";
 my ($wd) = $opt->get_opt("TG3C.workdir");
 
@@ -55,8 +56,10 @@ if ( !-e "$wd/conf" ) {
     make_path("$wd/conf");
 }
 
-#=========================
-#Extracting only the relevant reads by stripping
+############################
+# Parse only the baits' reads and 
+# filter out non-specific reads.
+############################
 if ( $opt->get_opt( "TG3C.do_strip", 1 ) ) {
     print STDERR "\n3CPipe: will do stripping\n";
     my ($fastq_dir)       = $sample->{fastqs_dir};
@@ -109,7 +112,9 @@ if ( $opt->get_opt( "TG3C.do_strip", 1 ) ) {
     }
 }
 
-#seg on RE
+#############################
+# Segmenet reads by RE seq
+#############################
 if ( $opt->get_opt( "TG3C.do_seg", 1 ) ) {
     print STDERR "\n3CPipe: will do segmentation\n";
 
@@ -143,7 +148,9 @@ if ( $opt->get_opt( "TG3C.do_seg", 1 ) ) {
     }
 }
 
-#map
+############################
+# Map with bowtie2
+############################
 if ( $opt->get_opt( "TG3C.do_map", 1 ) ) {
     print STDERR "3CPipe: bowtie mapping\n";
 
@@ -171,19 +178,21 @@ if ( $opt->get_opt( "TG3C.do_map", 1 ) ) {
     if ($ret) { die "\nERROR:\n===================\nbowtie mapping failed\n"; }
 }
 
-#chain
+############################
+# sam->chain->fendchain 
+############################
 if ( $opt->get_opt( "TG3C.do_fendchain", 1 ) ) {
     print STDERR "3CPipe: sam to fendchain\n";
     my ($dir_redb) = $opt->get_opt("TG3C.redb");
     my ($re)       = $opt->get_opt("TG3C.RE_seq");
     my ($min_qual) = $opt->get_opt( "TG3C.min_map_qual", 30 );
     my ($min_len)  = $opt->get_opt("TG3C.segment_min_len");
-    print STDERR "chaining\n";
+    print STDERR "\tchaining\n";
     $ret = system(
 "perl $dir_lscripts/TG3C/sam2chain.pl $wd/read1.sam $wd/chain $min_qual $min_len 2>$wd/logs/sam2chain.log"
     );
     if ($ret) { die "\nERROR:\n===================\nsam2chain.pl failed\n"; }
-    print STDERR "chain to fends";
+    print STDERR "\tchain to fends\n";
     $ret = system(
 "perl $dir_lscripts/TG3C/chain2fendchain.pl $dir_redb $re $wd/chain $wd/fendchain 2>$wd/logs/fendchain.log"
     );
@@ -193,9 +202,11 @@ if ( $opt->get_opt( "TG3C.do_fendchain", 1 ) ) {
     }
 }
 
-#adj
+############################
+# fendchain to adj table
+############################
 if ( $opt->get_opt( "TG3C.do_adj", 1 ) ) {
-    print STDERR "\n3CPipe: fendchain to adj\n";
+    print STDERR "3CPipe: fendchain to adj\n";
     my ($switch_ratio) = $opt->get_opt("TG3C.switch_ratio");
 
     my ($fendchain_in) = "$wd/fendchain";
@@ -216,7 +227,7 @@ if ( $opt->get_opt( "TG3C.do_adj", 1 ) ) {
 }
 
 if ( $opt->get_opt( "TG3C.do_adj_coord", 0 ) ) {
-    print STDERR "\n3CPipe: adj 2 coord\n";
+    print STDERR "3CPipe: adj 2 coord\n";
     my ($dir_redb) = $opt->get_opt("TG3C.redb");
     my ($re)       = $opt->get_opt("TG3C.RE_seq");
     if ( -e "$wd/adj.full" ) {
@@ -232,8 +243,11 @@ if ( $opt->get_opt( "TG3C.do_adj_coord", 0 ) ) {
     if ($ret) { die "\nERROR:\n===================\nadj2coords.pl failed\n"; }
 }
 
-if ( $opt->get_opt( "TG3C.split_tracks_by_baits", "FALSE" ) == "TRUE" ) {
-    print STDERR "\n3CPipe: will split tracks to baits\n";
+############################
+# Split adj by baits
+############################
+if ( $opt->get_opt( "TG3C.split_tracks_by_baits", "TRUE" ) == "TRUE" ) {
+    print STDERR "3CPipe: will split tracks to baits\n";
     my ($dir_redb) = $opt->get_opt("TG3C.redb");
     my ($re)       = $opt->get_opt("TG3C.RE_seq");
     my @conf_files = grep( /^\@/, @ARGV );
@@ -241,7 +255,8 @@ if ( $opt->get_opt( "TG3C.split_tracks_by_baits", "FALSE" ) == "TRUE" ) {
     my $cmd =
         "perl $dir_lscripts/TG3C/split_mplex_adj.pl "
       . "-adj $wd/adj "
-      . "-conf_file $conf_file "
+      . "-baits_tab $bait_tab_fn"
+      . "-samples_tab $samp_tab_fn"
       . "-sample_id $sample_id "
       . "-redb_dir $dir_redb "
       . "-re_seq $re "

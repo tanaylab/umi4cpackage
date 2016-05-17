@@ -44,10 +44,12 @@ p4cDumpConfFiles <- function(conf_dir)
     ret <- file.copy(conf_files, conf_dir, recursive=T, overwrite=FALSE)
     if (!all(ret)) 
     {
-        stop("couldn't dump conf files to ", conf_dir, "\n  Perhaps they're already there? ")    
+        warning("couldn't dump conf files to ", conf_dir, "\n  Perhaps they're already there? ")    
+    } else
+    {
+        message("Dumped conf (config) files to: ", conf_dir)
     }
-    message("Dumped conf (config) files to: ", conf_dir)
-    message("\nMake sure you fill all the conf files before continuing!\n")
+    message("\nMake sure you fill all the conf files before continuing!\n")  
 } 
 #' Load all the config files required for the package.
 #' 
