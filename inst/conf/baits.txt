@@ -1,0 +1,2 @@
+Bait_ID	Bait_name	Bait_seq	Bait_pad	Bait_chr	Bait_coord
+1	ANK1_TSS	AGTTTAGCAGACTCAAAGGAAAGC	CTCTAAGATC	8	41654693
