@@ -7,7 +7,7 @@ require map3c::ConfOpt;
 require map3c::TG3C::BaitsTab4C;
 require map3c::TG3C::SamplesTab4C;
 
-# valida configuration option names
+# Validate configuration option names
 
 my ($opt) = ConfOpt::new("ConfOpt");
 
