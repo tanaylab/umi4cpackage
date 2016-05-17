@@ -2,10 +2,18 @@
 % Please edit documentation in R/p4c_package.R
 \name{plot.p4cProfile}
 \alias{plot.p4cProfile}
+\alias{plotCompProf}
+\alias{plotSingleProf}
 \title{Plot 4C nearcis profile.}
 \usage{
 \method{plot}{p4cProfile}(p4c_obj1, p4c_obj2, trend_scale = "adaptive",
   png_fn = NA, ...)
+
+plotSingleProf(p4c_obj, trend_scale, png_fn, plot.colorbar, add.func, xlim,
+  ylim, trend_only, main, sd, ...)
+
+plotCompProf(p4c_obj1, ref_p4c_obj, trend_scale, png_fn, col, min_win_cov, xlim,
+  zlim, legend.text, ylim, dgram.method, main, sd)
 }
 \arguments{
 \item{p4c_obj1}{p4cProfile object created by \code{p4cNewProfile}.}
@@ -18,10 +26,6 @@ of the window (in restriction fragments units).}
 
 \item{png_fn}{File to save the plot to. The default (NA) will result in plotting on the 
 current graphic device.}
-
-\item{min_win_cov}{If the default smoothing method is used ('adaptive'), this parameter
-controls the window size by requiring that no less than \code{min_win_cov} molecules will be included
-in that genomic window.}
 
 \item{plot.colorbar}{Optional. Logical that defines whether a colorbar for the domainogram 
 should be plotted.}
@@ -36,10 +40,14 @@ ylim (In units of molecules).}
 
 \item{sd}{Controls the margins of the trendline. The Number of bionomial theoretical standard deviations.}
 
+\item{col}{Vector with length 2 that controls the colors of each profile in a comparative plot.}
+
+\item{min_win_cov}{If the default smoothing method is used ('adaptive'), this parameter
+controls the window size by requiring that no less than \code{min_win_cov} molecules will be included
+in that genomic window.}
+
 \item{legend.text}{Character vector with length 2. Controls the text in the color legend of the trendline.
 The default are the names of the profiles.}
-
-\item{col}{Vector with length 2 that controls the colors of each profile in a comparative plot.}
 }
 \description{
 Plot a nearcis profile in the defined genomic scope. Can be applied on a single 

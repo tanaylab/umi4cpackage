@@ -24,7 +24,7 @@ sub new($) {
 sub read_tab($$) {
     my($self, $tab_fn) = @_;
 
-    open(TAB, $tab_fn) || die "cannot open bait tab $tab_fn\n";
+    open(TAB, $tab_fn) || die "\nERROR: cannot open bait tab $tab_fn\n";
 
     my($h);
     $h = <TAB>;

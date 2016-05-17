@@ -255,8 +255,8 @@ if ( $opt->get_opt( "TG3C.split_tracks_by_baits", "TRUE" ) == "TRUE" ) {
     my $cmd =
         "perl $dir_lscripts/TG3C/split_mplex_adj.pl "
       . "-adj $wd/adj "
-      . "-baits_tab $bait_tab_fn"
-      . "-samples_tab $samp_tab_fn"
+      . "-baits_tab $bait_tab_fn "
+      . "-samples_tab $samp_tab_fn "
       . "-sample_id $sample_id "
       . "-redb_dir $dir_redb "
       . "-re_seq $re "
@@ -265,13 +265,16 @@ if ( $opt->get_opt( "TG3C.split_tracks_by_baits", "TRUE" ) == "TRUE" ) {
     if ($ret) { warn "Couldn't split adj by baits\n"; }
 }
 
+############################
+# Get stats
+############################
 if ( $opt->get_opt( "TG3C.do_QC", 1 ) ) {
     print STDERR "\n3CPipe: will write 3C_stats.txt file\n";
     my @conf_files = grep( /^\@/, @ARGV );
     my $conf_file = substr( $conf_files[0], 1 );
     my $cmd =
         "perl $dir_lscripts/TG3C/QC4C.pl -workdir $wd "
-      . " -conf_file $conf_file -output "
+      . " -samples_tab $samp_tab_fn -baits_tab $bait_tab_fn -output "
       . "$wd/3C_stats.txt -sample_id $sample_id";
     my $ret = system($cmd);
     if ($ret) { warn "\nERROR:\n===================\nQC4C.pl failed\n"; }

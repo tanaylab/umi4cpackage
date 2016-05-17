@@ -7,28 +7,24 @@ use map3c::ConfOpt;
 require map3c::TG3C::BaitsTab4C;
 require map3c::TG3C::SamplesTab4C;
 
-my ($workdir, $conf_file, $sample_id);
+my ($workdir, $conf_file, $sample_id, $bait_tab_fn, $samp_tab_fn);
 my $out_fn = undef;
-my $pipeline_home = realpath("$FindBin::Bin/../../..");
 
-die "usage perl $0 -workdir workdir -conf_file conf_file -sample_id [ID] [-output ..] \n" if @ARGV < 2;
+die "usage perl $0 -workdir workdir --samples_tab <tab> --baits_tab <tab>  -sample_id [ID] [-output ..] \n" if @ARGV < 2;
 
 GetOptions("workdir=s"   => \$workdir,
-           "conf_file=s" => \$conf_file,
+           "baits_tab=s" => \$bait_tab_fn,
+           "samples_tab=s" => \$samp_tab_fn,
            "output=s"    => \$out_fn,
            "sample_id=i" => \$sample_id)
 	or die "not all args supplied\n";
 
 
 #init conf object and read conf file
-my($opt) = ConfOpt::new("ConfOpt");
-$opt->read_conf($conf_file);
 
-my($bait_tab_fn)  = "$pipeline_home/" . $opt->get_opt("TG3C.baits_tab");
 my($baits) = TG3C::BaitsTab4C::new("TG3C::BaitsTab4C");
 $baits->read_tab($bait_tab_fn);
 
-my($samp_tab_fn)  = "$pipeline_home/" . $opt->get_opt("TG3C.samples_tab");
 my($samps) = TG3C::SamplesTab4C::new("TG3C::SamplesTab4C");
 $samps->read_tab($samp_tab_fn);
 

@@ -159,8 +159,8 @@ plot.p4cProfile <- function(p4c_obj1, p4c_obj2, trend_scale = "adaptive", png_fn
     }
     
 }
-# plot function will get a dgram list which could be normalized to ref (object?)
-# for plotting
+
+#' @rdname plot.p4cProfile
 plotSingleProf <- function(p4c_obj, trend_scale, png_fn, plot.colorbar, add.func, 
     xlim, ylim, trend_only, main, sd, ...) UseMethod("plotSingleProf")
 
@@ -375,7 +375,7 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NA, trend_scale = "adapt
     
 }
 
-### function for comparing two profiles
+#' @rdname plot.p4cProfile
 plotCompProf <- function(p4c_obj1, ref_p4c_obj, trend_scale, png_fn, col, min_win_cov, 
     xlim, zlim, legend.text, ylim, dgram.method, main, sd) UseMethod("plotCompProf")
 
@@ -462,8 +462,6 @@ plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adapti
     if (!missing(main)) 
         title(main = main)
     
-    grid(lwd = 1)
-    
     par(mar = c(0, 4, 0, 2))
     
     # plot heatmap of smoothing
@@ -480,7 +478,6 @@ plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adapti
             n:2]))
         image(x = coords, z = dlt_dgram[, n:2], axes = F, col = colorRampPalette(c(col[2], 
             "white", col[1]))(1000), zlim = zlim, bty = "o", xlim = xlim, )
-        grid(lwd = 1, ny = NA)
     } else if (dgram.method == "p4c_obj1" | dgram.method == "ref_p4c_obj")
     {
         if (dgram.method == "p4c_obj1") 
@@ -558,38 +555,32 @@ plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adapti
 
 # generate a barplot of two samples mean and sd return chi-sq test result for two
 # samples
-
-p4cBoxplotInInterval <- function(p4c_obj, ref_p4c_obj, start, end, col = c("red", 
-    "black"))
-    {
-    data <- .p4cReportIntervalData(p4c_obj, ref_p4c_obj, start, end, rawdata = T)
-    boxplot(list(data[, 2], data[, 3]), col = col)
-    
-    # calc chisq p-value for region
-    temp1 <- p4cNewProfile(unlist(strsplit(p4c_obj$track_nm, " ")), p4c_obj$bait$chrom, 
-        p4c_obj$bait$start, 1e+06, 1e+06)
-    temp2 <- p4cNewProfile(unlist(strsplit(ref_p4c_obj$track_nm, " ")), ref_p4c_obj$bait$chrom, 
-        ref_p4c_obj$bait$start, 1e+06, 1e+06)
-    scope_idx <- which(temp1$dgram[, 1] >= start & temp1$dgram[, 1] <= end)
-    
-    N1 <- sum(temp1$dgram[, 2])
-    N2 <- sum(temp2$dgram[, 2])
-    n1 <- sum(temp1$dgram[scope_idx, 2])
-    n2 <- sum(temp2$dgram[scope_idx, 2])
-    
-    mat <- matrix(c(n1, N1 - n1, n2, N2 - n2), nrow = 2, byrow = F, dimnames = list(c("win", 
-        "tot"), c("1", "2")))
-    return(chisq.test(mat))
-    
-}
-
+#' Compare contacts intensities between two profiles
+#' 
+#' Compare contact intensities at specific genomic intervals. 
+#' 
+#' When a genomic region is suspected to be defferentialy contacting between two profiles, 
+#' it is possible to compare these two profiles in the same intervals by deriving the normalized contact values
+#' in that region. This function facilitates this task. It returns a data.frame with 
+#' the either the row molecule counts if \code{rowdata = TRUE} or normalized other wise.
+#' The smoothing is controlled by \code{min_win_cov}.
+#' 
+#' The p-value is calculated for the entire interval with a chi-square test. However,
+#' it assumes the interval is <1Mb from the bait. If the interval is >1Mb from the bait
+#'  \code{max_scope} should be increased accordingly.
+#' 
+#' @param p4c_obj A \code{p4cProfile} object.
+#' @param ref_p4c_obj The \code{p4cProfile} object one wishes to compare to.
+#' @param start,end Start and end coordinates of the genomic interval.
+#' @param min_win_cov Controls the smoothing as described in \code{plot.p4cProfile}.
+#' @param rowdata Return raw molecule counts instead of smoothed data.
 p4cIntervalsMean <- function(p4c_obj, ref_p4c_obj, start, end, min_win_cov = 30, 
-    rawdata = FALSE)
+    rawdata = FALSE, max_scope=1e6)
     {
     temp1 <- p4cNewProfile(unlist(strsplit(p4c_obj$track_nm, " ")), p4c_obj$bait$chrom, 
-        p4c_obj$bait$start, 1e+06, 1e+06)
+        p4c_obj$bait$start, max_scope, max_scope)
     temp2 <- p4cNewProfile(unlist(strsplit(ref_p4c_obj$track_nm, " ")), ref_p4c_obj$bait$chrom, 
-        ref_p4c_obj$bait$start, 1e+06, 1e+06)
+        ref_p4c_obj$bait$start, max_scope, max_scope)
     
     # normalize p4c_obj1 to p4c_obj2
     p4c_obj <- .p4cNormDgram(p4c_obj, ref_p4c_obj)
@@ -639,121 +630,15 @@ p4cIntervalsMean <- function(p4c_obj, ref_p4c_obj, start, end, min_win_cov = 30,
     slice_df$p.value <- pv
     return(slice_df)
 }
-
-
-p4cGetMultiTrends <- function(p4c_tracks, ref_p4c_track, chrom, bait_start, scope_5, 
-    scope_3, min_win_cov = 30, trend_scale = "adaptive")
-    {
-    ref_p4c_obj <- p4cNewProfile(ref_p4c_track, chrom, bait_start, scope_5, scope_3)
-    ref_p4c_obj <- .p4cGenerateBaitDgram(ref_p4c_obj)
-    
-    
-    coords <- ref_p4c_obj$dgram[, 1]
-    mat <- data.frame(coords = coords)
-    i <- 1
-    for (obj_track in p4c_tracks)
-    {
-        obj <- p4cNewProfile(obj_track, chrom, bait_start, scope_5, scope_3)
-        obj <- .p4cGenerateBaitDgram(obj)
-        obj <- .p4cNormDgram(obj, ref_p4c_obj)
-        
-        if (trend_scale == "adaptive")
-        {
-            trend_l <- .p4cSmoothedTrendComp(obj, ref_p4c_obj, min_win_cov = min_win_cov)
-            trend <- trend_l$trend_mat$p4c_obj1
-            ref_trend <- trend_l$trend_mat$ref_p4c_obj
-            coords <- trend_l$trend_mat$start
-        } else
-        {
-            trend <- obj$dgram.norm$dgram[, trend_scale + 2]
-            ref_trend <- ref_p4c_obj$dgram[, trend_scale + 2]
-            coords <- ref_p4c_obj$dgram[, 1]
-        }
-        
-        track_nm <- obj$track_nm
-        mat <- cbind(mat, track_nm = trend)
-        
-        colnames(mat)[ncol(mat)] <- obj$track_nm
-        
-        if (i == length(p4c_tracks))
-        {
-            mat$coords <- coords
-            mat <- cbind(mat, ref_trend)
-            colnames(mat)[ncol(mat)] <- ref_p4c_track
-        }
-        i <- i + 1
-    }
-    
-    mat
-}
-
-
-
-p4cPlotHic <- function(p4c_obj, hic_track_nm, bws = seq(2000, 5e+05, by = 2000), 
-    shades, mincov = 100, reserve_bottom = 0, maxy = (horiz3 + horiz5) * 0.45, ticx = 250000, 
-    xlim, trend_ylim, trend_scale = "adaptive", n_grid_tics = 6)
-    {
-    bait <- c(p4c_obj$bait$chrom, p4c_obj$bait$start, p4c_obj$bait$start + 1)
-    horiz5 <- p4c_obj$scope[["scope_5"]]
-    horiz3 <- p4c_obj$scope[["scope_3"]]
-    colspec <- c("white", "lightblue", "blue", "darkblue", "red", "black", "black", 
-        "black", "yellow")
-    if (missing(shades)) 
-        shades <- colorRampPalette(colspec)(500)
-    
-    m = gtrack.2d.extract_mat_norm(c(hic_track_nm), bait, horiz5 * 2.5, horiz3 * 
-        2.5, bws, mincov)
-    baitx = as.numeric(bait[2])
-    minx = baitx - horiz5
-    maxx = baitx + horiz3
-    
-    if (!missing(xlim))
-    {
-        minx <- xlim[1]
-        maxx <- xlim[2]
-    }
-    
-    layout(matrix(1:2, nrow = 2), h = c(1, 1.5))
-    par(cex = 1)
-    par(mar = c(0, 4, 0, 2))
-    par(oma = c(2, 0.4, 1, 0.4))
-    par(xaxs = "i", yaxs = "i")
-    
-    # plot trend
-    if (missing(trend_ylim))
-    {
-        plot(p4c_obj, trend_only = T, xlim = c(minx, maxx), trend_scale = trend_scale)
-    } else
-    {
-        plot(p4c_obj, trend_only = T, xlim = c(minx, maxx), trend_scale = trend_scale, 
-            ylim = trend_ylim)
-    }
-    
-    # plot HiC:
-    par(mar = c(0, 4, 0, 2))
-    n <- ncol(m$mat)
-    image(x = m$x, y = m$y, m$mat[, n:1], xlim = c(minx, maxx), ylim = c(max(m$y) - 
-        maxy, max(m$y)), col = shades, useRaster = TRUE, xlab = NA, ylab = NA, yaxt = "n", 
-        bty = "n", cex.lab = 3, cex.axis = 3)
-    
-    yaxis_points <- seq(max(m$y) - maxy, max(m$y), l = 5)
-    axis(2, at = yaxis_points, labels = rev(seq(0, maxy, l = 5)), las = 2, cex = 2)
-    grid_tics = seq(ticx * round((baitx - horiz5)/ticx), ticx * round((baitx + horiz3 * 
-        2)/ticx), ticx)
-    
-    for (tic in grid_tics)
-    {
-        lines(c(minx, tic), c(max(m$y) - (tic - minx), max(m$y)), col = "white", 
-            lty = 2)
-        lines(c(minx, tic), c(max(m$y) - maxy + (tic - minx), max(m$y) - maxy), col = "white", 
-            lty = 2)
-    }
-}
-
-# ` Export bedGraph. ` ` \code{p4cExportBedGraph} export the smoothed trend to a
-# bedGraph file to display in the UCSC browser ` ` This function saves the
-# smoothed trend values into file that can be ` displayed in the UCSC genome
-# browser.
+#' Export bedGraph
+#' 
+#' \code{p4cExportBedGraph} exports the smoothed trend to a file which can be imported as a 'custom track'
+#' to the UCSC genome browser.
+#' 
+#' @param p4c_obj \code{p4cProfile} object
+#' @param filename Filename of the bedGraph.
+#' @param min_win_cov Smoothing parameter.
+#' @param color Color of the bedGraph plot.
 p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 30, color = "black")
 {
     cur_name <- p4c_obj$track_nm
@@ -778,8 +663,9 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 30, color = "blac
     write.table(bed_df, filename, append = T, quote = F, col.names = F, row.names = F)
     message("Wrote bedGraph file to ", filename)
 }
-
-# Internal functions for p4c packge
+########################################################################
+# Internal functions for p4c package
+#######################################################################
 .p4cGenerateBaitDgram <- function(p4c_obj) UseMethod(".p4cGenerateBaitDgram")
 .p4cGenerateBaitDgram.p4cProfile = function(p4c_obj)
 {

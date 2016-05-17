@@ -16,9 +16,9 @@ p4cCreate4CseqTrack(sample_ids, track_desc = "4C track", verbose = TRUE,
 
 \item{groot}{Optional. Controls the trackdb to which tracks are imported.}
 
-\item{skip.if.exists}{Should it skip if it sees an exisiting tack with the same name?}
+\item{skip.if.exists}{Skips if there's already an exisiting track with the same name.}
 
-\item{overwrite.if.exists}{Should a new track overwrite an older one with the same name?}
+\item{overwrite.if.exists}{Force overwriting on older tracks.}
 }
 \description{
 Generate a genomic track from fastqs listed in the samples.conf file.
