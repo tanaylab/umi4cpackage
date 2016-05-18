@@ -40,6 +40,14 @@ p4cNewProfile <- function(track_nm, bait_chrom = gtrack.attr.get(track_nm[1], "B
         stop("No bait attributes for track name - Please supply the parameters")
     }
     
+    # check confs were loaded
+    if (is.null(getOption("TG3C.trackdb")) | 
+            is.null(getOption("TG3C.kill_self_horiz")) | 
+            is.null(getOption("TG3C.switch_ratio"))) 
+    {
+        stop("Conf parameters are missing! have you loaded them with p4cLoadConfFiles ?")
+    }
+    
     p4c_obj <- list(track_nm = paste(track_nm, collapse = " "), bait = list(chrom = bait_chrom, 
         start = as.numeric(bait_start), bait_pad = as.numeric(getOption("TG3C.bait_pad"))), 
         scope = c(scope_5, scope_3))

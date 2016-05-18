@@ -1,4 +1,4 @@
-
+#' Read params from files
 init_params = function(fn, prev_params=NULL)
 {
     t = read.table(fn, sep = "=", fill = T, strip.white=T, stringsAsFactors=FALSE, quote="")
@@ -25,7 +25,7 @@ init_params = function(fn, prev_params=NULL)
     
     return(params)
 }
-
+#' Get params from saved var
 get_param = function(nm, params)
 {
     if (nm %in% names(params))
@@ -37,7 +37,7 @@ get_param = function(nm, params)
         return(NA)
     }
 }
-
+#' Get params from saved var
 get_param_list = function(nm, params)
 {
     if (nm %in% names(params))

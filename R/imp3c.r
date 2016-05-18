@@ -8,6 +8,8 @@
 #' @param output_dir Output directory for the dataset.
 #' @param genome For which genome build should the data be download. Current options available are:
 #' 'hg19', 'mm9', 'mm10'.
+#' 
+#' @export 
 p4cBuildRequirements <- function(output_dir, genome="hg19", reseq="GATC", 
         dataset_keys="http://www.wisdom.weizmann.ac.il/~omersch/dataset_keys.txt")
 {
@@ -37,6 +39,8 @@ p4cBuildRequirements <- function(output_dir, genome="hg19", reseq="GATC",
 #' Dump templates of config files required by the package.
 #' 
 #' @param conf_dir Directory to dump to files to.
+#' 
+#' @export 
 p4cDumpConfFiles <- function(conf_dir)
 {
     conf_files <- dir(system.file("conf", package='umi4cPackage'), full.names=T)
@@ -51,6 +55,7 @@ p4cDumpConfFiles <- function(conf_dir)
     }
     message("\nMake sure you fill all the conf files before continuing!\n")  
 } 
+
 #' Load all the config files required for the package.
 #' 
 #' Loads the config files which were filled by the user. Accepts either directory path
@@ -61,6 +66,8 @@ p4cDumpConfFiles <- function(conf_dir)
 #' @param paths_conf Parameter file like \emph{paths.conf}
 #' @param pipeline_conf Parameter file like \emph{pipeline.conf}
 #' @param p4c_conf Parameter file like \emph{p4c.conf}
+#' 
+#' @export 
 p4cLoadConfFiles <- function(conf_dir, 
     paths_conf=file.path(conf_dir, "paths.conf"),
     pipeline_conf=file.path(conf_dir, "pipeline.conf"),
@@ -101,6 +108,8 @@ p4cLoadConfFiles <- function(conf_dir,
 #' @param overwrite.if.exists Force overwriting on older tracks.
 #' @param verbose Logical. Controls verbosity. 
 #' @param groot Optional. Controls the trackdb to which tracks are imported.
+#' 
+#' @export 
 p4cCreate4CseqTrack = function(sample_ids, track_desc = "4C track",  verbose = TRUE, skip.if.exist = FALSE, 
     overwrite.if.exist = TRUE, groot = NULL)
     {
