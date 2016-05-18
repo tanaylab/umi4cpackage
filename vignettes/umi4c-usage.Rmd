@@ -1,0 +1,181 @@
+```{r, echo = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+```{r, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+devtools::load_all("/home/omersch/omer_raid/umi4cPackage/")
+```
+---
+title: "umi4cPackage"
+author: "Omer Schwartzman"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+UMI-4C Package is a processing and analysis pipeline for UMI-4C experiments. 
+
+## Background
+This package is intended for processing and analysis of UMI-4C experiments. The UMI-4C protocol exploits 
+sonication of 3C template material to facilitate molecule counting and quantitative analysis of chromatin contacts of one or several genomic loci at high resolution.  
+
+The two parts of the package are:  
+
+- __Processing of of raw reads (FASTQ format) to genomic tracks:__
+__Paired-end__ FASTQ files are parsed, splitted according to the restriction enzyme sequence (Usually DpnII) 
+  and summarized in adjacency table (_adj_ file). This part uses as a bunch of _Perl_ scripts wrapped in R.
+- __Analyzing UMI-4C genomic tracks and producing nearcis figures:__
+Genomic tracks are dynamically processed to produce nearcis profiles at the desired genomic region specified by the user.
+
+## Installation
+### Requirements:
+The pipeline is designed to run on a standard linux machine. The basic requirements are: 
+
+- _Perl_
+- _Bowtie2_: <http://bowtie-bio.sourceforge.net/bowtie2>.
+- Reference index for _Bowtie2_.
+- R packages:
+    * _devtools_.
+    * _misha_.
+    * _zoo_.
+
+
+#### Installing misha package:
+Since _misha_ package is not in CRAN, we will need to install it directly as follow:  
+Download the package from: <http://compgenomics.weizmann.ac.il/tanay/?page_id=617>.   
+Install the package:
+```{r, eval=FALSE}
+install.packages("misha_3.2.7.tar.gz", repos=NULL) #Installs misha package from file
+```
+
+#### Importing UMI-4C package:
+Download and install _umi4cPackage_: 
+```{r, eval=FALSE}
+devtools::install_bitbucket("tanaylab/umi4cpackage")
+library(umi4cPackage)
+```
+  
+##### Preparing genomic database
+The pipeline requires a special database called _trackdb_ which contains binary genomic tracks and other data, as well as restriction site database in text format called _redb_.  
+  
+Downloading the data (~2.5Gb) is done from inside the package.  
+We will first create a new project directory:
+```bash
+mkdir my_u4c_proj
+
+```
+From _R_ we will download the data to the provided folder:
+```{r, eval=FALSE}
+library("umi4cPackage")
+# Use build 'hg19' for DpnII enzyme
+p4cBuildRequirements(output_dir = "my_u4c_proj", genome = "hg19", reseq = "GATC")
+```
+Two directory will be generated after downloading the extracting the data:  
+
+- __my_u4c_proj/hg19/trackdb__  
+- __my_u4c_proj/hg19/redb__
+
+---
+
+### Configuration files
+The next step is to set up the _conf_ files. To do so we will first need to dump templates of conf files to a conf directory:
+```{r, eval=FALSE, warning=FALSE}
+p4cDumpConfFiles(conf_dir = "my_u4c_proj/conf")
+```
+  
+Now we will need to go to the supplied directory (`my_u4c_proj/conf` in our case) and complete the _conf_ files.  
+__Make sure that all newlines are linux compatible (\\n) and not windows (\\r\\n)!__  
+
+- __paths.conf__: Set the paths to the directories and dependencies.  
+- __samples.txt__: Samples table, tab separated. One row for each experiment. Mandatory columns are:  
+    - __Sample_ID__: Unique ID. 
+    - __Sample_name__: Unique sample name. e.g., Cell type, condition etc...
+    - __Experiment\_name__: A shared name for the experiment batch.    
+    - __fastqs_regex__: Regular expression that captures all FASTQ files names associated with the sample. __Important: the files should have the suffix \*.fastq . The FASTQ filenames must also contain 'R1' and 'R2' which associate the file with the paired-end sequencing direction__. 
+    - __fastqs_dir__: Path to FASTQ directory.
+    - __Bait_IDs__: Unique IDs of baits associated with the experiment. A comma separated list of bait IDs from baits.txt.
+- __baits.txt__: Baits table, tab separated. One row for each bait. Mandatory columns are:  
+    - __Bait\_ID__: Unique bait ID - associates sample to bait.
+    - __Bait\_name__: Unique bait name. 
+    - __Bait\_seq__: Sequence of the (DS) bait primer without the padding sequence. It accepts also regular expressions (e.g., AGGCA.+GGG). 
+    - __Bait\_pad__: Padding sequence - the sequence between the bait primer end to the bait fragment restriction site (including the restriction sequence, e.g., for DpnII: XXXXGATC).
+    - __Bait\_chr__: Bait chromosome.
+    - __Bait\_coord__: Bait coord. Ideally the coordinate of the nearest restriction site to the bait.
+- __pipeline.conf__: Pipeline settings. The defaults should work fine for __DpnII__.  
+- __p4c.conf__: Analysis settings. The defaults should work fine.  
+
+---
+
+## Importing and analyzing UMI-4C files.
+### Initialization:
+We need to load the configuration files to our envirnoment by:
+```{r, eval=TRUE}
+p4cLoadConfFiles(conf_dir = "my_u4c_proj/conf")
+```
+#### Working example:
+Download example fastqs from: <http://compgenomics.weizmann.ac.il/tanay/?page_id=617>. These files include three UMI-4C experiments done on three cell lines on the _ANK1_ promoter.  
+Extract the files to a directory.  
+In __samples.txt__ - change _fastqs\_dir_ to the working directory with the downloaded example files. Notice that the pipeline detect the files associated files by the regular expression pattern defined in _fastqs\_regex_. See that _Bait\_IDs_ of the samples is 1.  
+In __baits.txt__ - Inspect that indeed the _Bait\_ID_ 1 is correctly filled.  
+
+##### Importing genomic tracks
+Now we will run the pipeline on a single sample:
+```{r, eval=FALSE}
+p4cCreate4CseqTrack(sample_ids = 1)
+```
+All intermediate files will be saved in the workdir that was defined in _TG3C.workdir_ parameter.
+
+The pipeline uses the samples and baits tables to retrieve the relevant information on experiment ID#1, and transform the raw fastq files to UMI counts (see more details on intermediate steps below). This might take some time, depending on the size of the fastq file and the machine being used. 
+Then UMI counts are imported and saved in a special data structure we refer to as "genomic tracks". For each sample-bait combination a genomic track will generated.
+In our example, a track named `umi4C_example_CMK_ANK1_TSS` will be generated. This track contains data for sample CMK and bait _ANK1\_TSS_.  
+After successfully importing the data, the pipeline will report some essential statistics.  
+These statistics can also be accessed from 4CQC.txt in the sample workdir directory.  
+
+Once imported the genomic tracks are saved in our trackdb, and can be listed by:  
+```{r, eval=TRUE}
+gtrack.ls()
+```
+
+#### Analyzing and plotting
+Now we can analyze the data:  
+Suppose we want to create an UMI-4C profile 200kb upstream and downstream the bait in our exmaple CMK experiment. The first step is to create `p4cProfile object`:
+```{r, eval=TRUE}
+CMK_fc <- p4cNewProfile("umi4C_example_CMK_ANK1_TSS", scope_5=200000, scope_3=200000)
+```
+
+Plot nearcis profile:
+```{r}
+plot(CMK_fc)
+```
+This command generates a plot of the 4C profile with a smoothed trend and a domainogram. It accepts some more parameters which are described in the function documentation.  
+For example, if we want to save the domainogram to a png file we can do:
+```{r, eval=FALSE}
+plot(CMK_fc, png_fn="figs/CMK_ANK1_TSS.png")
+```
+
+#### Compare the profile to another profile
+To compare two 4C experiments, we first import two other profiles (notice, this time we will do it in batch):
+```{r, eval=FALSE}
+p4cCreate4CseqTrack(sample_ids = c(2,3))
+```
+Two new tracks were created. To list the tracks again by `gtrack.ls()`.
+
+
+After the tracks were imported we can produce comparative plots. For example, we will compare CMK
+which express _ANK1_ gene to _DND41_ which does not.
+```{r, message=FALSE}
+# Generate a second p4cProfile on the same scope
+DND41_fc <- p4cNewProfile("umi4C_example_DND41_ANK1_TSS", scope_5=200000, scope_3=200000)
+
+# plot a comparative plot
+plot(CMK_fc, DND41_fc)
+```
+
+Additional feature is the ability to derive mean contact intensity for defined genomic intervals. The following command will return normalized contact intensities of the two profiles, fold change, 
+and p-value (Chi-square test)
+```{r, message=FALSE}
+fold_change <- p4cIntervalsMean(CMK_fc, DND41_fc, start=41665000, end=41675000)
+knitr::kable(fold_change, align = 'l', digits=2)
+```

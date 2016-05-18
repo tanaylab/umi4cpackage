@@ -1,5 +1,5 @@
 Package: umi4cPackage
-Title: Processing Analysis of UMI-4C contact profiles.
+Title: Processing & Analysis of UMI-4C Contact Profiles.
 Version: 0.0.0.9000
 Authors@R: c(person("Amos", "Tanay", role=c("aut")), 
     person("Omer", "Schwartzman", email="omer.schwartzman@gmail.com", role=c("aut", "cre")))

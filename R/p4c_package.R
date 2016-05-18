@@ -1,9 +1,3 @@
-require(misha)
-suppressPackageStartupMessages(require(zoo))
-
-#trackdb_path = get_param("TG3C.trackdb", params)
-#gset_input_mode(autocompletion = FALSE, interactive = FALSE)
-#gsetroot(trackdb_path)
 
 #' Create a new p4cProfile object.
 #' 
@@ -238,7 +232,7 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NA, trend_scale = "adapt
             message("trend is adaptive")
         } else
         {
-            message("will create smoothed trend for track")
+            message("Will create smoothed trend for track with min_win_cov = ", min_win_cov)
             p4c_obj <- .p4cSmoothedTrend(p4c_obj, min_win_cov)
         }
         coords <- p4c_obj$smoothedTrend$start
@@ -273,7 +267,7 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NA, trend_scale = "adapt
     coords_fends <- dgram[, 1]
     missing_re_idx <- which(coords_fends[-1] - coords_fends[-length(coords_fends)] > 
         30000)
-    message("plotting from", horiz5, " to ", horiz3)
+    message("Plotting from ", horiz5, " to ", horiz3)
     
     if (missing(ylim))
     { 
@@ -342,9 +336,9 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NA, trend_scale = "adapt
     {
         dgram[, 3:n] = log2(dgram[, 3:n] + 1) - log2(norm_factor + 1)  #fixed a bug that resulted in strange output if max value of trend <1
     }
-    message("range of values in dgram: from ", min(dgram_orig[, n:3], na.rm = T), 
+    message("Range of values in dgram: from ", min(dgram_orig[, n:3], na.rm = T), 
         " to ", max(dgram_orig[, n:3], na.rm = T))
-    message("transform to log2(fraction of max): from ", min(dgram[, n:3], na.rm = T), 
+    message("Transformed to log2(fraction of max): from ", min(dgram[, n:3], na.rm = T), 
         " to ", max(dgram[, n:3], na.rm = T))
     shades <- colorRampPalette(p4c_obj$graphics_params$shades)(1000)
     
@@ -435,8 +429,8 @@ plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adapti
     if (missing(ylim)) 
         ylim <- c(0, max(trend1, ref_trend, na.rm = T) + 0.5)
     
-    message("plotting ", xlim[1], " ", xlim[2])
-    message("Range ", range(coords)[1], " To ", range(coords)[2])
+    message("Plotting ", xlim[1], " ", xlim[2])
+    message("Range ", range(coords)[1], " to ", range(coords)[2])
     
     plot(coords, trend1, lwd = 2, type = "l", ylim = ylim, xlab = "", ylab = "", 
         xaxt = "n", yaxt = 'n', col = col[1], xlim = xlim, bty = "n")
@@ -494,7 +488,7 @@ plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adapti
     par(mar = c(0, 4, 0, 2))
     if (dgram.method == "delta")
     {
-        message("range of dlt_dgram: ", min(dlt_dgram[, n:2]), " ", max(dlt_dgram[, 
+        message("Range of dlt_dgram: ", min(dlt_dgram[, n:2]), " ", max(dlt_dgram[, 
             n:2]))
         image(x = coords, z = dlt_dgram[, n:2], axes = F, col = colorRampPalette(c(col[2], 
             "white", col[1]))(1000), zlim = zlim, bty = "o", xlim = xlim, )
@@ -516,9 +510,9 @@ plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adapti
         {
             dgram[, 3:n] = log2(dgram[, 3:n]) - log2(norm_factor)
         }
-        message("range of values in dgram: from ", min(dgram_orig[, n:3], na.rm = T), 
+        message("Range of values in dgram: from ", min(dgram_orig[, n:3], na.rm = T), 
             " to ", max(dgram_orig[, n:3], na.rm = T))
-        message("transform to log2(fraction of max): from ", min(dgram[, n:3], na.rm = T), 
+        message("Transformed to log2(fraction of max): from ", min(dgram[, n:3], na.rm = T), 
             " to ", max(dgram[, n:3], na.rm = T))
         shades <- colorRampPalette(p4c_obj1$graphics_params$shades)(1000)
         
@@ -696,7 +690,7 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "blac
 .p4cGenerateBaitDgram.p4cProfile = function(p4c_obj)
 {
     stat_type <- p4c_obj$dgram_params$stat_type
-    message("will use stat_type ", stat_type)
+    message("Will use stat_type ", stat_type)
     kill_self_horiz <- getOption("TG3C.kill_self_horiz", 1500)
     
     re_seq <- p4c_obj$dgram_params$re_seq
@@ -742,7 +736,7 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "blac
     prof = prof[abs(prof$start2 - as.numeric(bait_start)) > kill_self_horiz, ]
     bait_idx <- which(abs(prof$start2 - as.numeric(bait_start)) == min(abs(prof$start2 - 
         as.numeric(bait_start))))[1]
-    message("done extract, contacts in window: ", sum(prof$mol))
+    message("Done extract, contacts in window: ", sum(prof$mol))
     
     dgram = matrix(prof$start2)
     n = nrow(prof)
@@ -850,7 +844,7 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "blac
         tot_in_bin <- sum(mols[f_bin])
     sum_vec[f_bin] = tot_in_bin
     
-    sum_vec = rollmean(sum_vec, post_smooth_win, fill = c(sum_vec[1], NA, sum_vec[length(sum_vec)]))
+    sum_vec = zoo::rollmean(sum_vec, post_smooth_win, fill = c(sum_vec[1], NA, sum_vec[length(sum_vec)]))
     # return only scope values
     f_coords_in_scope <- coords %in% dgram[, 1]
     
@@ -976,7 +970,7 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "blac
     
     # passing over all values in the matrix and looking for the min values which pass
     # threshold filling the smoothing vector with this values.
-    message("will attempt getting coverage for ", ncol(dgram1), " scales")
+    message("Will attempt getting coverage for ", ncol(dgram1), " scales")
     for (i in (2 + min_res):ncol(dgram1))
     {
         cur_scale <- base_scales[i - 2]
@@ -1001,10 +995,9 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "blac
     return(list(trend_mat = trend_mat, dlt_dgram = dlt_dgram))
 }
 
-#################################################### Auxiliary functions for object construction
 
 
-# function to calc geometric mean of coordinates relative to distance from bait
+# Calc geometric mean of coordinates relative to distance from bait
 .p4cWinGeoMeanCoordinate <- function(coords, scale, bait_x)
 {
     bait_idx <- which(abs(coords - as.numeric(bait_x)) == min(abs(coords - as.numeric(bait_x))))[1]
@@ -1012,8 +1005,8 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "blac
     offsets[bait_idx] <- 1  #avoiding plugging 0s in the log
     
     
-    mean_offsets1 <- exp(rollmean(log(offsets[1:bait_idx]), scale, fill = NA))
-    mean_offsets2 <- exp(rollmean(log(offsets[(bait_idx + 1):length(offsets)]), scale, 
+    mean_offsets1 <- exp(zoo::rollmean(log(offsets[1:bait_idx]), scale, fill = NA))
+    mean_offsets2 <- exp(zoo::rollmean(log(offsets[(bait_idx + 1):length(offsets)]), scale, 
         fill = NA))
     
     # deal with NAs near the bait
