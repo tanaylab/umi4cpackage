@@ -22,6 +22,8 @@ suppressPackageStartupMessages(require(zoo))
 #'  Either "linear" or "log", for arithmetic or geometric means, respectively. Default 
 #'  is "linear".
 #' @return Returns a p4cProfile object.
+#' 
+#' @export
 p4cNewProfile <- function(track_nm, bait_chrom = gtrack.attr.get(track_nm[1], "Bait_chr"), 
     bait_start = as.numeric(gtrack.attr.get(track_nm[1], "Bait_coord")), scope_5, 
     scope_3, stat_type)
@@ -63,6 +65,7 @@ p4cNewProfile <- function(track_nm, bait_chrom = gtrack.attr.get(track_nm[1], "B
 
 #### Generic function for print
 
+#' @export
 print.p4cProfile <- function(p4c_obj)
 {
     cat("p4cProfile object\n\n")
@@ -77,13 +80,15 @@ print.p4cProfile <- function(p4c_obj)
 
 
 #### Summery generic function will return basic stats of track
+#' @export
 summary.p4cProfile <- function(p4c_obj)
 {
     track_nm <- unlist(strsplit(p4c_obj$track_nm, " "))[1]
-    bait_chrom <- p4c_obj$bait$chrom
+    bait_chrom <- paste0('chr', gsub('chr', '', p4c_obj$bait$chrom))
     bait_start <- p4c_obj$bait$start
     bait_pad <- p4c_obj$bait$bait_pad
     
+   
     d <- nrow(ALLGENOME[[1]])
     ivals <- gintervals.2d(rep(bait_chrom, d), rep(bait_start - bait_pad, d), rep(bait_start + 
         bait_pad, d), ALLGENOME[[1]]$chrom, ALLGENOME[[1]]$start, ALLGENOME[[1]]$end)
@@ -143,6 +148,8 @@ summary.p4cProfile <- function(p4c_obj)
 #' @param legend.text Character vector with length 2. Controls the text in the color legend of the trendline.
 #'  The default are the names of the profiles.    
 #' @param col Vector with length 2 that controls the colors of each profile in a comparative plot. 
+#' 
+#' @export
 plot.p4cProfile <- function(p4c_obj1, p4c_obj2, trend_scale = "adaptive", png_fn = NA, 
     ...)
     {
@@ -161,9 +168,11 @@ plot.p4cProfile <- function(p4c_obj1, p4c_obj2, trend_scale = "adaptive", png_fn
 }
 
 #' @rdname plot.p4cProfile
+#' @export
 plotSingleProf <- function(p4c_obj, trend_scale, png_fn, plot.colorbar, add.func, 
     xlim, ylim, trend_only, main, sd, ...) UseMethod("plotSingleProf")
 
+#' @export
 plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NA, trend_scale = "adaptive", 
     ref_track_nm = NA, min_win_cov = 50, plot.colorbar = FALSE, add.func, xlim, ylim, 
     trend_only = FALSE, main, sd = 2, ...)
@@ -376,9 +385,11 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NA, trend_scale = "adapt
 }
 
 #' @rdname plot.p4cProfile
+#' @export
 plotCompProf <- function(p4c_obj1, ref_p4c_obj, trend_scale, png_fn, col, min_win_cov, 
     xlim, zlim, legend.text, ylim, dgram.method, main, sd) UseMethod("plotCompProf")
 
+#' @export
 plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adaptive", 
     png_fn = NA, col = c("red", "black"), min_win_cov = 50, xlim, zlim = c(-1.5, 
         1.5), legend.text, ylim, dgram.method = "delta", main, sd = 2, ...)
@@ -419,9 +430,10 @@ plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adapti
     message("plotting ", xlim[1], " ", xlim[2])
     message("Range ", range(coords)[1], " To ", range(coords)[2])
     
-    plot(coords, trend1, lwd = 2, type = "l", ylim = ylim, xlab = "", ylab = "contacts", 
-        xaxt = "n", col = col[1], xlim = xlim, bty = "n")
+    plot(coords, trend1, lwd = 2, type = "l", ylim = ylim, xlab = "", ylab = "", 
+        xaxt = "n", yaxt = 'n', col = col[1], xlim = xlim, bty = "n")
     
+    axis(2, las = 1, cex.axis = 1)
     points(p4c_obj1$dgram.norm$dgram[, 1], pmin(p4c_obj1$dgram.norm$dgram[, 2], ylim[2]), 
         col = col[1], pch = 16, cex = 0.7)
     points(ref_p4c_obj$dgram[, 1], pmin(ref_p4c_obj$dgram[, 2], ylim[2]), col = col[2], 
@@ -574,6 +586,8 @@ plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adapti
 #' @param start,end Start and end coordinates of the genomic interval.
 #' @param min_win_cov Controls the smoothing as described in \code{plot.p4cProfile}.
 #' @param rowdata Return raw molecule counts instead of smoothed data.
+#' 
+#' @export
 p4cIntervalsMean <- function(p4c_obj, ref_p4c_obj, start, end, min_win_cov = 30, 
     rawdata = FALSE, max_scope=1e6)
     {
@@ -639,7 +653,9 @@ p4cIntervalsMean <- function(p4c_obj, ref_p4c_obj, start, end, min_win_cov = 30,
 #' @param filename Filename of the bedGraph.
 #' @param min_win_cov Smoothing parameter.
 #' @param color Color of the bedGraph plot.
-p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 30, color = "black")
+#' 
+#' @export
+p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "black")
 {
     cur_name <- p4c_obj$track_nm
     cur_desc <- sprintf("UMI-4C track smoothed values in scope (min coverage - %i molecules)", 
@@ -663,6 +679,8 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 30, color = "blac
     write.table(bed_df, filename, append = T, quote = F, col.names = F, row.names = F)
     message("Wrote bedGraph file to ", filename)
 }
+
+
 ########################################################################
 # Internal functions for p4c package
 #######################################################################
