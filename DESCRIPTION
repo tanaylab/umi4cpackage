@@ -5,14 +5,13 @@ Authors@R: c(person("Amos", "Tanay", role=c("aut")),
     person("Omer", "Schwartzman", email="omer.schwartzman@gmail.com", role=c("aut", "cre")))
 Description: Process UMI-4C data from scratch to produce nice plots.
 Depends:
-    R (>= 3.2),
+    R (>= 3.0),
     misha
 License: 
 Encoding: UTF-8
 LazyData: true
 Imports:
     misha,
-    RCurl,
     zoo
 RoxygenNote: 5.0.1
 Suggests: knitr,
