@@ -125,7 +125,15 @@ p4cCreate4CseqTrack = function(sample_ids, track_desc = "4C track",  verbose = T
     samples_tab_nm <- getOption("TG3C.samples_tab")
     
     baits_tab <- read.table(baits_tab_nm, header = TRUE, stringsAsFactors=FALSE)
+    if (anyDuplicated(baits_tab$Bait_ID)) 
+    {
+        stop("Duplicated values in baits table - make sure not duplicated values in bait_ID")
+    }
     samples_tab <- read.table(samples_tab_nm, header = TRUE, stringsAsFactors=FALSE)
+    if (anyDuplicated(samples_tab$Sample_ID)) 
+    {
+        stop("Duplicated values in samples table - make sure not duplicated values in sample_ID")
+    }
     
     
     trackdb_path = getOption("TG3C.trackdb")
@@ -155,11 +163,11 @@ p4cCreate4CseqTrack = function(sample_ids, track_desc = "4C track",  verbose = T
     adj_list = list()
     for (foc_ndx in sample_ids)
     {
-        
+        row_idx <- which(samples_tab$Sample_ID == foc_ndx)
         message("working on sample ID ", foc_ndx, "\n")
-        exp_nm <- samples_tab$Experiment_name[foc_ndx]
-        sample_nm <- samples_tab$Sample_name[foc_ndx]
-        baits_idx <- as.numeric(strsplit(as.character(samples_tab$Bait_IDs[foc_ndx]), 
+        exp_nm <- samples_tab$Experiment_name[row_idx]
+        sample_nm <- samples_tab$Sample_name[row_idx]
+        baits_idx <- as.numeric(strsplit(as.character(samples_tab$Bait_IDs[row_idx]), 
             split = ",")[[1]])
         
         foc_ndx_track_name = sprintf("%s_%s_%s", base_track_nm, exp_nm, sample_nm)
