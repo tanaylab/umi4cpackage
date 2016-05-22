@@ -98,6 +98,22 @@ p4cLoadConfFiles <- function(conf_dir,
 
     invisible()
 }
+
+
+#' Check conf files were loaded.
+.checkConf <- function(additional_params = NULL){
+    params <- c("TG3C.trackdb", "TG3C.kill_self_horiz", "TG3C.switch_ratio")
+    if (!is.null(additional_params)) 
+    {
+        params <- c(params, additional_params)
+    }
+
+    if (!all( params %in% names(options()) )) 
+    {
+        stop("Missing conf parameters! Have you loaded the files with 4cLoadConfFiles?")
+    }
+}
+
 #' Import fastq files to a genomic track.
 #' 
 #' Generate a genomic track from fastqs listed in the samples.conf file.
@@ -110,9 +126,10 @@ p4cLoadConfFiles <- function(conf_dir,
 #' @param groot Optional. Controls the trackdb to which tracks are imported.
 #' 
 #' @export 
-p4cCreate4CseqTrack = function(sample_ids, track_desc = "4C track",  verbose = TRUE, skip.if.exist = TRUE, 
+p4cCreate4CseqTrack = function(sample_ids = NULL, track_desc = "4C track",  verbose = TRUE, skip.if.exist = TRUE, 
     overwrite.if.exist = FALSE, groot = NULL)
 {
+    .checkConf()
     options(gparam.type = "string")
     Sys.setenv(PERL_BADLANG = 0)
     pipeline_conf_path <- getOption("TG3C.pipeline_conf_path")
@@ -161,6 +178,9 @@ p4cCreate4CseqTrack = function(sample_ids, track_desc = "4C track",  verbose = T
     }
     
     adj_list = list()
+    if (is.null(samples_ids)){
+        sample_ids <- samples_tab$Sample_ID
+    }
     for (foc_ndx in sample_ids)
     {
         row_idx <- which(samples_tab$Sample_ID == foc_ndx)
@@ -177,12 +197,14 @@ p4cCreate4CseqTrack = function(sample_ids, track_desc = "4C track",  verbose = T
         for (bait_id in baits_idx)
         {
             bait_name <- baits_tab$Bait_name[bait_id]
+#TODO non numeric bait_id
             foc_ndx_track_name_bait <- paste0(foc_ndx_track_name, "_", bait_name)
             if (overwrite.if.exist & gtrack.exists(foc_ndx_track_name_bait))
             {
                 message("track ", foc_ndx_track_name_bait, " already exist, overwriting it...\n")
                 gtrack.rm(foc_ndx_track_name_bait, T)
             }
+#TODO remove skip.if.exist
             if (gtrack.exists(foc_ndx_track_name_bait) & skip.if.exist)
             {
                 message("Skipping processing of track ", foc_ndx_track_name_bait, ": already exists.\n")
@@ -227,7 +249,7 @@ p4cCreate4CseqTrack = function(sample_ids, track_desc = "4C track",  verbose = T
  for (bait_id in baits_idx)
         {
             bait_name <- baits_tab$Bait_name[bait_id]
-            contacts_fn = sprintf("%s/%s.%s/adj.%s", work_dir, exp_nm, sample_nm, 
+            contacts_fn <- sprintf("%s/%s.%s/adj.%s", work_dir, exp_nm, sample_nm, 
               bait_name)
             foc_ndx_track_name_bait <- paste0(foc_ndx_track_name, "_", bait_name)
             message("Will import ", foc_ndx_track_name_bait, " from ", contacts_fn, 

@@ -34,13 +34,7 @@ p4cNewProfile <- function(track_nm, bait_chrom = gtrack.attr.get(track_nm[1], "B
         stop("No bait attributes for track name - Please supply the parameters")
     }
     
-    # check confs were loaded
-    if (is.null(getOption("TG3C.trackdb")) | 
-            is.null(getOption("TG3C.kill_self_horiz")) | 
-            is.null(getOption("TG3C.switch_ratio"))) 
-    {
-        stop("Conf parameters are missing! have you loaded them with p4cLoadConfFiles ?")
-    }
+    .checkConf()
     
     p4c_obj <- list(track_nm = paste(track_nm, collapse = " "), bait = list(chrom = bait_chrom, 
         start = as.numeric(bait_start), bait_pad = as.numeric(getOption("TG3C.bait_pad"))), 
@@ -61,7 +55,7 @@ p4cNewProfile <- function(track_nm, bait_chrom = gtrack.attr.get(track_nm[1], "B
     
     stat_type <- p4c_obj$dgram_params$stat_type
     p4c_obj <- .p4cGenerateBaitDgram(p4c_obj)
-    p4c_obj
+    return(p4c_obj)
 }
 
 
@@ -123,7 +117,7 @@ summary.p4cProfile <- function(p4c_obj)
 #' p4cProfile object or a two object for a comparison plot.
 #' 
 #' This function calls two methods depending on whether it is called on a single object
-#' or two object. When it is called on a single p4cProfile object it will produce a nearcis
+#' or two objects. When it is called on a single p4cProfile object it will produce a nearcis
 #' plot with smoothed trendline, and a contact intensity domainogram. 
 #' Calling this function for two object will produce a comparison plot of where the 
 #' 4C profiles are normalized for UMI coverage. The two p4cProfile objects must be
@@ -296,7 +290,7 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NA, trend_scale = "adapt
     if (stat_type == "linear") 
         points(dgram[, 1], pmin(dgram[, 2], ylim[2]), col = "gray", pch = 19, cex = 0.5)
     
-    # plot 1 sd of trend sqrt(k/n)
+    # plot sd of trend sqrt(k/n)
     if (is.numeric(trend_scale))
     {
         trend_nna <- trend
@@ -320,7 +314,7 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NA, trend_scale = "adapt
     # plot main trend
     lines(coords, trend, type = "l", lwd = 3, col = "black")
     
-    if (trend_only == TRUE) 
+    if (trend_only) 
         return()
     
     # plot dgram
@@ -505,7 +499,7 @@ plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adapti
         
         if (norm_factor < 1)
         {
-            dgram[, 3:n] = log2(dgram[, 3:n] + 1) - log2(norm_factor + 1)  #fixed a bug that resulted in strange output if max value of trend <1
+            dgram[, 3:n] = log2(dgram[, 3:n] + 1) - log2(norm_factor + 1) 
         } else
         {
             dgram[, 3:n] = log2(dgram[, 3:n]) - log2(norm_factor)
@@ -567,8 +561,6 @@ plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adapti
     slice_df
 }
 
-# generate a barplot of two samples mean and sd return chi-sq test result for two
-# samples
 #' Compare contacts intensities between two profiles
 #' 
 #' Compare contact intensities at specific genomic intervals. 
