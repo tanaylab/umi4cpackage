@@ -8,6 +8,7 @@
 #' @param output_dir Output directory for the dataset.
 #' @param genome For which genome build should the data be download. Current options available are:
 #' 'hg19', 'mm9', 'mm10'.
+#' @param reseq Restriction enzye database. Currently only DpnII (\strong{GATC}) is available.
 #' 
 #' @export 
 p4cBuildRequirements <- function(output_dir, genome="hg19", reseq="GATC", 
@@ -93,6 +94,8 @@ p4cLoadConfFiles <- function(conf_dir,
     }
     
     options(op.p4c)
+    
+    .checkConf()
     gset_input_mode(autocompletion = FALSE, interactive = FALSE)
     gsetroot(getOption("TG3C.trackdb"))
 
@@ -100,8 +103,9 @@ p4cLoadConfFiles <- function(conf_dir,
 }
 
 
-#' Check conf files were loaded.
-.checkConf <- function(additional_params = NULL){
+# Check conf files were loaded.
+.checkConf <- function(additional_params = NULL)
+{
     params <- c("TG3C.trackdb", "TG3C.kill_self_horiz", "TG3C.switch_ratio")
     if (!is.null(additional_params)) 
     {
@@ -120,13 +124,21 @@ p4cLoadConfFiles <- function(conf_dir,
 #' 
 #' @param sample_ids Numerical samples IDs from the baits.txt table.
 #' @param track_desc Description attribute. Optional.
-#' @param skip.if.exists Skips if there's already an exisiting track with the same name.
 #' @param overwrite.if.exists Force overwriting on older tracks.
 #' @param verbose Logical. Controls verbosity. 
 #' @param groot Optional. Controls the trackdb to which tracks are imported.
 #' 
+#' @examples
+#' \donttest{
+#' # Load config files
+#' p4cLoadConfFiles("conf/")
+#' 
+#' # Import 3 tracks
+#' p4cCreate4CseqTrack(1:3)
+#' }
+#' 
 #' @export 
-p4cCreate4CseqTrack = function(sample_ids = NULL, track_desc = "4C track",  verbose = TRUE, skip.if.exist = TRUE, 
+p4cCreate4CseqTrack = function(sample_ids = NULL, track_desc = "4C track",  verbose = TRUE,  
     overwrite.if.exist = FALSE, groot = NULL)
 {
     .checkConf()
@@ -178,13 +190,24 @@ p4cCreate4CseqTrack = function(sample_ids = NULL, track_desc = "4C track",  verb
     }
     
     adj_list = list()
-    if (is.null(samples_ids)){
+    if (is.null(sample_ids)){
         sample_ids <- samples_tab$Sample_ID
     }
     for (foc_ndx in sample_ids)
     {
         row_idx <- which(samples_tab$Sample_ID == foc_ndx)
-        message("working on sample ID ", foc_ndx, "\n")
+
+        # Test existence
+        if (length(row_idx) == 0) 
+        {
+            stop("No Sample_ID ", foc_ndx, ", check samples table!")
+        }
+        if (length(row_idx) > 1)
+        {
+            stop("Sample_ID in samples table are not unique! (In Sample_ID ", foc_ndx, " )")
+        }
+        
+        message("working on sample ID ", foc_ndx)
         exp_nm <- samples_tab$Experiment_name[row_idx]
         sample_nm <- samples_tab$Sample_name[row_idx]
         baits_idx <- as.numeric(strsplit(as.character(samples_tab$Bait_IDs[row_idx]), 
@@ -192,20 +215,28 @@ p4cCreate4CseqTrack = function(sample_ids = NULL, track_desc = "4C track",  verb
         
         foc_ndx_track_name = sprintf("%s_%s_%s", base_track_nm, exp_nm, sample_nm)
         
-        # Check existance  
+        # Check existence  
         existing_tracks <- 0
         for (bait_id in baits_idx)
         {
-            bait_name <- baits_tab$Bait_name[bait_id]
-#TODO non numeric bait_id
+            bait_row_idx <- which(baits_tab$Bait_ID == bait_id)
+            if (length(bait_row_idx) == 0) 
+            {
+                stop("No Bait_ID ", bait_id, " for Sample_ID ", foc_ndx, "\n  Check baits/samples tables!")
+            }
+            if (length(bait_row_idx) > 1)
+            {
+                stop("Bait_ID in baits table are not unique! (In Bait_ID ", bait_id, " )")
+            }
+            
+            bait_name <- baits_tab$Bait_name[bait_row_idx]
             foc_ndx_track_name_bait <- paste0(foc_ndx_track_name, "_", bait_name)
             if (overwrite.if.exist & gtrack.exists(foc_ndx_track_name_bait))
             {
                 message("track ", foc_ndx_track_name_bait, " already exist, overwriting it...\n")
                 gtrack.rm(foc_ndx_track_name_bait, T)
             }
-#TODO remove skip.if.exist
-            if (gtrack.exists(foc_ndx_track_name_bait) & skip.if.exist)
+            if (gtrack.exists(foc_ndx_track_name_bait) & !overwrite.if.exist)
             {
                 message("Skipping processing of track ", foc_ndx_track_name_bait, ": already exists.\n")
                 existing_tracks <- existing_tracks + 1
@@ -214,7 +245,7 @@ p4cCreate4CseqTrack = function(sample_ids = NULL, track_desc = "4C track",  verb
         }
         if (existing_tracks == length(baits_idx)) 
         {
-            message('All tracks from sample ID ', foc_ndx, ' already imported, skipping sample ID...')
+            message('All tracks from sample ID ', foc_ndx, ' already imported, skipping sample ID...\n')
             next
         }
         
@@ -246,9 +277,10 @@ p4cCreate4CseqTrack = function(sample_ids = NULL, track_desc = "4C track",  verb
         
        
     # Genereate a track for each bait
- for (bait_id in baits_idx)
+        for (bait_id in baits_idx)
         {
-            bait_name <- baits_tab$Bait_name[bait_id]
+            bait_row_idx <- which(baits_tab$Bait_ID == bait_id)
+            bait_name <- baits_tab$Bait_name[bait_row_idx]
             contacts_fn <- sprintf("%s/%s.%s/adj.%s", work_dir, exp_nm, sample_nm, 
               bait_name)
             foc_ndx_track_name_bait <- paste0(foc_ndx_track_name, "_", bait_name)
@@ -256,8 +288,8 @@ p4cCreate4CseqTrack = function(sample_ids = NULL, track_desc = "4C track",  verb
               " fends at ", fends_fn)
             gtrack.2d.import_contacts(foc_ndx_track_name_bait, description = track_desc, 
               contacts = contacts_fn, fends = fends_fn)
-            bait_chr <- baits_tab$Bait_chr[bait_id]
-            bait_coord <- baits_tab$Bait_coord[bait_id]
+            bait_chr <- baits_tab$Bait_chr[bait_row_idx]
+            bait_coord <- baits_tab$Bait_coord[bait_row_idx]
             gtrack.attr.set(foc_ndx_track_name_bait, attr = "Bait_name", value = bait_name)
             gtrack.attr.set(foc_ndx_track_name_bait, attr = "Bait_chr", value = bait_chr)
             gtrack.attr.set(foc_ndx_track_name_bait, attr = "Bait_coord", value = bait_coord)

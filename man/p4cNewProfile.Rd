@@ -6,7 +6,7 @@
 \usage{
 p4cNewProfile(track_nm, bait_chrom = gtrack.attr.get(track_nm[1], "Bait_chr"),
   bait_start = as.numeric(gtrack.attr.get(track_nm[1], "Bait_coord")),
-  scope_5, scope_3, stat_type)
+  scope_5 = 250000, scope_3 = 250000, stat_type)
 }
 \arguments{
 \item{track_nm}{2D genomic track name. Can also be a character vector of track
@@ -17,7 +17,8 @@ names that will be pooled together by summation.}
 \item{bait_start}{Integer. Start coordinate of the bait.}
 
 \item{scope_5, scope_3}{Define the scope of the profile. How many bases upstream
-and downstream of the bait should be used for generating the profile.}
+and downstream of the bait should be used for generating the profile. 
+Default is set to 250kb upstream and downstream.}
 
 \item{stat_type}{Define the method for calculating the profile contact intensities. 
 Either "linear" or "log", for arithmetic or geometric means, respectively. Default 

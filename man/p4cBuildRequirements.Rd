@@ -12,6 +12,8 @@ p4cBuildRequirements(output_dir, genome = "hg19", reseq = "GATC",
 
 \item{genome}{For which genome build should the data be download. Current options available are:
 'hg19', 'mm9', 'mm10'.}
+
+\item{reseq}{Restriction enzye database. Currently only DpnII (\strong{GATC}) is available.}
 }
 \description{
 Downloads the required datasets for the package: trackdb and redb. These datasets
