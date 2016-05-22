@@ -11,7 +11,8 @@
 #' @param bait_chrom Character. Bait chromosome.
 #' @param bait_start Integer. Start coordinate of the bait.
 #' @param scope_5,scope_3 Define the scope of the profile. How many bases upstream
-#'  and downstream of the bait should be used for generating the profile.  
+#'  and downstream of the bait should be used for generating the profile. 
+#'  Default is set to 250kb upstream and downstream.
 #' @param stat_type Define the method for calculating the profile contact intensities. 
 #'  Either "linear" or "log", for arithmetic or geometric means, respectively. Default 
 #'  is "linear".
@@ -19,8 +20,8 @@
 #' 
 #' @export
 p4cNewProfile <- function(track_nm, bait_chrom = gtrack.attr.get(track_nm[1], "Bait_chr"), 
-    bait_start = as.numeric(gtrack.attr.get(track_nm[1], "Bait_coord")), scope_5, 
-    scope_3, stat_type)
+    bait_start = as.numeric(gtrack.attr.get(track_nm[1], "Bait_coord")), scope_5=2.5e5, 
+    scope_3=2.5e5, stat_type)
     {
     for (nm in track_nm)
     {
@@ -37,7 +38,7 @@ p4cNewProfile <- function(track_nm, bait_chrom = gtrack.attr.get(track_nm[1], "B
     .checkConf()
     
     p4c_obj <- list(track_nm = paste(track_nm, collapse = " "), bait = list(chrom = bait_chrom, 
-        start = as.numeric(bait_start), bait_pad = as.numeric(getOption("TG3C.bait_pad"))), 
+        start = as.numeric(bait_start), bait_lookup_expansion = as.numeric(getOption("TG3C.bait_lookup_expansion"))), 
         scope = c(scope_5, scope_3))
     
     class(p4c_obj) <- "p4cProfile"
@@ -82,17 +83,17 @@ summary.p4cProfile <- function(p4c_obj)
     track_nm <- unlist(strsplit(p4c_obj$track_nm, " "))[1]
     bait_chrom <- paste0('chr', gsub('chr', '', p4c_obj$bait$chrom))
     bait_start <- p4c_obj$bait$start
-    bait_pad <- p4c_obj$bait$bait_pad
+    bait_lookup_expansion <- p4c_obj$bait$bait_lookup_expansion
     
    
     d <- nrow(ALLGENOME[[1]])
-    ivals <- gintervals.2d(rep(bait_chrom, d), rep(bait_start - bait_pad, d), rep(bait_start + 
-        bait_pad, d), ALLGENOME[[1]]$chrom, ALLGENOME[[1]]$start, ALLGENOME[[1]]$end)
+    ivals <- gintervals.2d(rep(bait_chrom, d), rep(bait_start - bait_lookup_expansion, d), rep(bait_start + 
+        bait_lookup_expansion, d), ALLGENOME[[1]]$chrom, ALLGENOME[[1]]$start, ALLGENOME[[1]]$end)
     
     ivals.trans <- ivals[ivals$chrom2 != bait_chrom, ]
     
-    ivals.nearcis <- gintervals.2d(bait_chrom, bait_start - bait_pad, bait_start + 
-        bait_pad, bait_chrom, bait_start - 1e+06, bait_start + 1e+06)
+    ivals.nearcis <- gintervals.2d(bait_chrom, bait_start - bait_lookup_expansion, bait_start + 
+        bait_lookup_expansion, bait_chrom, bait_start - 1e+06, bait_start + 1e+06)
     filter_arg <- paste0(track_nm, " > 0")
     track_summary <- gsummary(track_nm, intervals = gscreen(filter_arg, ivals))
     track_trans_summary <- gsummary(track_nm, intervals = gscreen(filter_arg, ivals.trans))
@@ -131,7 +132,7 @@ summary.p4cProfile <- function(p4c_obj)
 #' @param min_win_cov If the default smoothing method is used ('adaptive'), this parameter
 #'  controls the window size by requiring that no less than \code{min_win_cov} molecules will be included
 #'  in that genomic window.
-#' @param png_fn File to save the plot to. The default (NA) will result in plotting on the 
+#' @param png_fn File to save the plot to. The default (NULL) will result in plotting on the 
 #'  current graphic device.
 #' @param plot.colorbar Optional. Logical that defines whether a colorbar for the domainogram 
 #'  should be plotted.
@@ -145,8 +146,25 @@ summary.p4cProfile <- function(p4c_obj)
 #'  The default are the names of the profiles.    
 #' @param col Vector with length 2 that controls the colors of each profile in a comparative plot. 
 #' 
+#' @examples 
+#' \donttest{
+#' # Create a p4cProfile object:
+#' fc <- p4cNewProfile("umi4C_example_CMK_ANK1_TSS")
+#' 
+#' # Plot a profile on:
+#' plot(fc, xlim=c(41554693, 41754693), ylim=c(0, 5), plot.colorbar=TRUE)
+#' 
+#' 
+#' # Comparing two profiles:
+#' # Create a second profile
+#' fc_cond2 <- p4cNewProfile("umi4C_example_DND41_ANK1_TSS")
+#' 
+#' # Plot profiles
+#' plot(fc, fc_cond2, col=c('red', 'blue'), min_win_cov=100, main = '4C figure', png_fn='fig.png') 
+#' }
+#' 
 #' @export
-plot.p4cProfile <- function(p4c_obj1, p4c_obj2, trend_scale = "adaptive", png_fn = NA, 
+plot.p4cProfile <- function(p4c_obj1, p4c_obj2, trend_scale = "adaptive", png_fn = NULL, 
     ...)
     {
     if (missing(p4c_obj2))
@@ -169,7 +187,7 @@ plotSingleProf <- function(p4c_obj, trend_scale, png_fn, plot.colorbar, add.func
     xlim, ylim, trend_only, main, sd, ...) UseMethod("plotSingleProf")
 
 #' @export
-plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NA, trend_scale = "adaptive", 
+plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NULL, trend_scale = "adaptive", 
     ref_track_nm = NA, min_win_cov = 50, plot.colorbar = FALSE, add.func, xlim, ylim, 
     trend_only = FALSE, main, sd = 2, ...)
     {
@@ -236,7 +254,7 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NA, trend_scale = "adapt
     trend <- trend[!is.na(coords)]
     coords <- na.omit(coords)
     
-    if (!is.na(png_fn))
+    if (!is.null(png_fn))
     {
         png_fn <- paste0(p4c_obj$figure_params$png_dir, "", png_fn)
         png(png_fn, width = p4c_obj$figure_params$png_w, height = p4c_obj$figure_params$png_h, 
@@ -373,7 +391,7 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NA, trend_scale = "adapt
     {
         eval(add.func)
     }
-    if (!is.na(png_fn))
+    if (!is.null(png_fn))
     {
         dev.off()
     }
@@ -387,7 +405,7 @@ plotCompProf <- function(p4c_obj1, ref_p4c_obj, trend_scale, png_fn, col, min_wi
 
 #' @export
 plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adaptive", 
-    png_fn = NA, col = c("red", "black"), min_win_cov = 50, xlim, zlim = c(-1.5, 
+    png_fn = NULL, col = c("red", "black"), min_win_cov = 50, xlim, zlim = c(-1.5, 
         1.5), legend.text, ylim, dgram.method = "delta", main, sd = 2, ...)
         {
     # normalize p4c_obj1 to p4c_obj2
@@ -407,7 +425,7 @@ plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adapti
     n <- ncol(dlt_dgram)
     
     # plot comp profiles
-    if (!is.na(png_fn))
+    if (!is.null(png_fn))
     {
         png_fn <- paste0(p4c_obj1$figure_params$png_dir, "", png_fn)
         png(png_fn, width = p4c_obj1$figure_params$png_w, height = p4c_obj1$figure_params$png_h, 
@@ -518,7 +536,7 @@ plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adapti
     
     axis(1, round(seq(xlim[1], xlim[2], l = 9)/1e+06, 2) * 1e+06, labels = round(seq(xlim[1], 
         xlim[2], l = 9)/1e+06, 2), cex.lab = 2, cex.axis = 1.4)
-    if (!is.na(png_fn))
+    if (!is.null(png_fn))
     {
         dev.off()
     }
@@ -690,7 +708,7 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "blac
     min_flen <- p4c_obj$dgram_params$min_flen
     scales <- p4c_obj$dgram_params$dgram_scales
     
-    bait_pad <- p4c_obj$bait$bait_pad
+    bait_lookup_expansion <- p4c_obj$bait$bait_lookup_expansion
     
     scope_5 <- p4c_obj$scope["scope_5"]
     scope_3 <- p4c_obj$scope["scope_3"]
@@ -710,8 +728,8 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "blac
     
     n = dim(re_map)[1]
     
-    re_interv = gintervals.2d(rep(bait_chrom, n), rep(as.numeric(bait_start) - bait_pad, 
-        n), rep(as.numeric(bait_start) + bait_pad, n), re_map$chrom, re_map$start, 
+    re_interv = gintervals.2d(rep(bait_chrom, n), rep(as.numeric(bait_start) - bait_lookup_expansion, 
+        n), rep(as.numeric(bait_start) + bait_lookup_expansion, n), re_map$chrom, re_map$start, 
         re_map$end)
     
     # add support for more than one track
@@ -1022,7 +1040,7 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "blac
 .p4cSetCurBait <- function(p4c_obj, bait_chrom, bait_start) UseMethod(".p4cSetCurBait")
 
 .p4cSetCurBait.p4cProfile <- function(p4c_obj, bait_chrom = NA, bait_start = NA, 
-    bait_pad = getOption("TG3C.bait_pad"))
+    bait_lookup_expansion = getOption("TG3C.bait_lookup_expansion"))
     {
     if (is.na(bait_chrom) | is.na(bait_start))
     {
@@ -1030,7 +1048,7 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "blac
         return(p4c_obj$bait)
     }
     
-    p4c_obj$bait <- list(chrom = bait_chrom, start = as.numeric(bait_start), bait_pad = as.numeric(bait_pad))
+    p4c_obj$bait <- list(chrom = bait_chrom, start = as.numeric(bait_start), bait_lookup_expansion = as.numeric(bait_lookup_expansion))
     if (!is.null(p4c_obj[["dgram"]]))
     {
         message("updating Dgram matrix")

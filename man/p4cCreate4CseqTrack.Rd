@@ -4,8 +4,8 @@
 \alias{p4cCreate4CseqTrack}
 \title{Import fastq files to a genomic track.}
 \usage{
-p4cCreate4CseqTrack(sample_ids, track_desc = "4C track", verbose = TRUE,
-  skip.if.exist = TRUE, overwrite.if.exist = FALSE, groot = NULL)
+p4cCreate4CseqTrack(sample_ids = NULL, track_desc = "4C track",
+  verbose = TRUE, overwrite.if.exist = FALSE, groot = NULL)
 }
 \arguments{
 \item{sample_ids}{Numerical samples IDs from the baits.txt table.}
@@ -16,11 +16,19 @@ p4cCreate4CseqTrack(sample_ids, track_desc = "4C track", verbose = TRUE,
 
 \item{groot}{Optional. Controls the trackdb to which tracks are imported.}
 
-\item{skip.if.exists}{Skips if there's already an exisiting track with the same name.}
-
 \item{overwrite.if.exists}{Force overwriting on older tracks.}
 }
 \description{
 Generate a genomic track from fastqs listed in the samples.conf file.
+}
+\examples{
+\donttest{
+# Load config files
+p4cLoadConfFiles("conf/")
+
+# Import 3 tracks
+p4cCreate4CseqTrack(1:3)
+}
+
 }
 

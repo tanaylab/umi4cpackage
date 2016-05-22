@@ -7,7 +7,7 @@
 \title{Plot 4C nearcis profile.}
 \usage{
 \method{plot}{p4cProfile}(p4c_obj1, p4c_obj2, trend_scale = "adaptive",
-  png_fn = NA, ...)
+  png_fn = NULL, ...)
 
 plotSingleProf(p4c_obj, trend_scale, png_fn, plot.colorbar, add.func, xlim,
   ylim, trend_only, main, sd, ...)
@@ -24,7 +24,7 @@ plotCompProf(p4c_obj1, ref_p4c_obj, trend_scale, png_fn, col, min_win_cov, xlim,
 'adaptive' (default), or, for fixed window trend, an integer with the desired size 
 of the window (in restriction fragments units).}
 
-\item{png_fn}{File to save the plot to. The default (NA) will result in plotting on the 
+\item{png_fn}{File to save the plot to. The default (NULL) will result in plotting on the 
 current graphic device.}
 
 \item{plot.colorbar}{Optional. Logical that defines whether a colorbar for the domainogram 
@@ -55,10 +55,28 @@ p4cProfile object or a two object for a comparison plot.
 }
 \details{
 This function calls two methods depending on whether it is called on a single object
-or two object. When it is called on a single p4cProfile object it will produce a nearcis
+or two objects. When it is called on a single p4cProfile object it will produce a nearcis
 plot with smoothed trendline, and a contact intensity domainogram. 
 Calling this function for two object will produce a comparison plot of where the 
 4C profiles are normalized for UMI coverage. The two p4cProfile objects must be
 constructed for the \strong{same bait} with the \strong{same genomic scope}.
+}
+\examples{
+\donttest{
+# Create a p4cProfile object:
+fc <- p4cNewProfile("umi4C_example_CMK_ANK1_TSS")
+
+# Plot a profile on:
+plot(fc, xlim=c(41554693, 41754693), ylim=c(0, 5), plot.colorbar=TRUE)
+
+
+# Comparing two profiles:
+# Create a second profile
+fc_cond2 <- p4cNewProfile("umi4C_example_DND41_ANK1_TSS")
+
+# Plot profiles
+plot(fc, fc_cond2, col=c('red', 'blue'), min_win_cov=100, main = '4C figure', png_fn='fig.png') 
+}
+
 }
 
