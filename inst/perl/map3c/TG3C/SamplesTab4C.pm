@@ -11,14 +11,10 @@ package TG3C::SamplesTab4C;
 
 sub new($) {
 	my($clas) = @_;
-
 	my($self) = {};
-	
 	bless($self,$clas);
-
-        $self->{samp} = [];
-        
-        return($self);
+    $self->{samp} = [];
+    return($self);
 }
 
 sub read_tab($$) {

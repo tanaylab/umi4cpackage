@@ -62,7 +62,12 @@ if ( !-e "$wd/conf" ) {
 ############################
 if ( $opt->get_opt( "TG3C.do_strip", 1 ) ) {
     print STDERR "\n3CPipe: will do stripping\n";
-    my ($fastq_dir)       = $sample->{fastqs_dir};
+    
+    my ($fastq_dir) = $sample->{fastqs_dir};
+    if ($fastq_dir !~ /\/$/) { #Check if dir ends with backslash and add it if not.
+        $fastq_dir .= "/";
+    }
+    
     my ($fastq_fn_regexp) = $sample->{fastqs_regex};
 
     #Check for gz files and extract them
