@@ -842,16 +842,21 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "blac
     {
         f_bin_exp = dlt < bins[i] * r_expand & dlt >= bins[i - 1]/r_expand
         f_bin = dlt < bins[i] & dlt >= bins[i - 1]
-        tot_in_bin = sum(log2(1 + mols[f_bin_exp]))
-        if (stat_type == "linear") 
+        if (stat_type == "log"){
+            tot_in_bin = sum(log2(1 + mols[f_bin_exp]))
+        } else if (stat_type == "linear"){ 
             tot_in_bin <- sum(mols[f_bin_exp])
+        }
         sum_vec[f_bin] = tot_in_bin
         message("bin ", bins[i], " tot ", tot_in_bin)
     }
+
     f_bin = dlt >= bins[length(bins)]
-    tot_in_bin <- sum(log2(1 + mols[f_bin]))
-    if (stat_type == "linear") 
+    if (stat_type == "log"){
+        tot_in_bin <- sum(log2(1 + mols[f_bin]))
+    } else if (stat_type == "linear"){
         tot_in_bin <- sum(mols[f_bin])
+    }
     sum_vec[f_bin] = tot_in_bin
     
     sum_vec = zoo::rollmean(sum_vec, post_smooth_win, fill = c(sum_vec[1], NA, sum_vec[length(sum_vec)]))
@@ -906,7 +911,7 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "blac
     
     p4c_obj$dgram.norm <- list(dgram = dgram1, factors = norm1)
     p4c_obj$normalized_by <- ref_p4c_obj$track_nm
-    p4c_obj
+    return(p4c_obj)
 }
 
 # Adaptive smoothing function for a single profile
@@ -939,7 +944,7 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "blac
     vec1[is.na(vec1)] <- NA
     coord[is.na(coord)] <- base_coord[is.na(coord)]
     p4c_obj$smoothedTrend <- list(start = sort(coord), trend = vec1, scale = scale)
-    p4c_obj
+    return(p4c_obj)
 }
 
 # Adaptive smoothing function for a comparative profile
@@ -984,9 +989,9 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "blac
     for (i in (2 + min_res):ncol(dgram1))
     {
         cur_scale <- base_scales[i - 2]
-        f <- is.na(vec1) & (dgram1[, i] * cur_scale * 2 > min_win_cov & dgram2[, 
-            i] * cur_scale * 2 > min_win_cov)
-        
+        f <- is.na(vec1) & 
+            (dgram1[, i] * cur_scale * 2 > min_win_cov & 
+            dgram2[, i] * cur_scale * 2 > min_win_cov)
         
         vec1[f] <- dgram1[f, i]
         vec2[f] <- dgram2[f, i]
@@ -1032,17 +1037,15 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "blac
     
     mean_offsets <- c(mean_offsets1, mean_offsets2)
     m_coords <- coords[bait_idx] + mean_offsets
-    # m_coords[is.na(m_coords)] <- coords[is.na(m_coords)]
     
-    m_coords
+    return(m_coords)
 }
 
 .p4cSetCurBait <- function(p4c_obj, bait_chrom, bait_start) UseMethod(".p4cSetCurBait")
-
-.p4cSetCurBait.p4cProfile <- function(p4c_obj, bait_chrom = NA, bait_start = NA, 
+.p4cSetCurBait.p4cProfile <- function(p4c_obj, bait_chrom = NULL, bait_start = NULL, 
     bait_lookup_expansion = getOption("TG3C.bait_lookup_expansion"))
     {
-    if (is.na(bait_chrom) | is.na(bait_start))
+    if (is.null(bait_chrom) | is.null(bait_start))
     {
         message("no new bait info, current bait:")
         return(p4c_obj$bait)
@@ -1060,12 +1063,11 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "blac
         warning("changed current bait, the normalized dgram is no longer valid!\n
             use .p4cNormDgram again")
     }
-    p4c_obj
+    return(p4c_obj)
 }
 
 .p4cSetCurScope <- function(p4c_obj, scope_5, scope_3) UseMethod(".p4cSetCurScope")
-
-.p4cSetCurScope.p4cProfile <- function(p4c_obj, scope_5 = NA, scope_3 = NA)
+.p4cSetCurScope.p4cProfile <- function(p4c_obj, scope_5 = NULL, scope_3 = NULL)
 {
     if (missing(scope_5) | missing(scope_3))
     {
@@ -1085,60 +1087,54 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "blac
         warning("changed current bait, the normalized dgram is no longer valid!\n
             use .p4cNormDgram again")
     }
-    p4c_obj
+    return(p4c_obj)
 }
 
 .p4cSetDgramParams <- function(p4c_obj, re_seq, map_thresh, min_flen, scales, stat_type) UseMethod(".p4cSetDgramParams")
-
 .p4cSetDgramParams.p4cProfile <- function(p4c_obj, re_seq = getOption("TG3C.RE_seq"), 
     map_thresh = getOption("TG3C.map_thresh"), min_flen = getOption("TG3C.min_flen"), 
     scales = getOption("TG3C.dgram_scales"), stat_type = getOption("TG3C.stat_type"))
-    {
+{
     l <- list(re_seq = re_seq, map_thresh = as.numeric(map_thresh), min_flen = as.numeric(min_flen), 
         dgram_scales = scales, stat_type = stat_type)
     p4c_obj$dgram_params <- l
-    p4c_obj
+    return(p4c_obj)
 }
 
 .p4cSetPngParams <- function(p4c_obj, png_w, png_h, png_dir, png_res) UseMethod(".p4cSetPngParams")
-
 .p4cSetPngParams.p4cProfile <- function(p4c_obj, png_w = getOption("TG3C.png_w"), png_h = getOption("TG3C.png_h"), 
     png_dir = getOption("TG3C.png_dir"), png_res = getOption("TG3C.png_res"))
-    {
+{
     l <- list(png_w = as.numeric(png_w), png_h = as.numeric(png_h), png_dir = png_dir, 
         png_res = as.numeric(png_res))
     p4c_obj$figure_params <- l
-    p4c_obj
+    return(p4c_obj)
 }
 
 .p4cSetDgramGraphics <- function(p4c_obj, zlim, shades) UseMethod(".p4cSetDgramGraphics")
-
 .p4cSetDgramGraphics.p4cProfile <- function(p4c_obj, zlim = getOption("TG3C.p4c_dgram_zlim"), 
     shades = getOption("TG3C.p4c_dgram_shades"))
-    {
+{
     p4c_obj$graphics_params <- list(zlim = zlim, shades = shades)
-    p4c_obj
+    return(p4c_obj)
 }
 
 # color scale bar function:
 .image.scale <- function(z, zlim, col = heat.colors(12), breaks, horiz = TRUE, ylim = NULL, 
     xlim = NULL, yaxt = "n", ...)
-    {
-    if (!missing(breaks))
-    {
+{
+    if (!missing(breaks)) {
         if (length(breaks) != (length(col) + 1))
         {
             stop("must have one more break than colour")
         }
     }
     
-    if (missing(breaks) & !missing(zlim))
-    {
+    if (missing(breaks) & !missing(zlim)) {
         breaks <- seq(zlim[1], zlim[2], length.out = (length(col) + 1))
     }
     
-    if (missing(breaks) & missing(zlim))
-    {
+    if (missing(breaks) & missing(zlim)) {
         zlim <- range(z, na.rm = TRUE)
         zlim[2] <- zlim[2] + c(zlim[2] - zlim[1]) * (0.001)
         zlim[1] <- zlim[1] - c(zlim[2] - zlim[1]) * (0.001)
@@ -1147,41 +1143,37 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "blac
     
     poly <- vector(mode = "list", length(col))
     
-    for (i in seq(poly))
-    {
+    for (i in seq(poly)) {
         poly[[i]] <- c(breaks[i], breaks[i + 1], breaks[i + 1], breaks[i])
     }
     
     xaxt <- ifelse(horiz, "s", "n")
     yaxt <- ifelse(horiz, "n", "s")
     
-    if (horiz)
-    {
+    if (horiz) {
         YLIM <- c(0, 1)
         XLIM <- range(breaks)
     }
     
-    if (!horiz)
-    {
+    if (!horiz) {
         YLIM <- range(breaks)
         XLIM <- c(0, 1)
     }
     
-    if (missing(xlim)) 
+    if (missing(xlim)){ 
         xlim = XLIM
-    if (missing(ylim)) 
+    }
+    if (missing(ylim)){
         ylim = YLIM
+    }
     
     plot(1, 1, t = "n", ylim = ylim, xlim = xlim, xaxt = xaxt, yaxt = yaxt, xaxs = "i", 
         yaxs = "i", ...)
-    for (i in seq(poly))
-    {
-        if (horiz)
-        {
+    for (i in seq(poly)) {
+        if (horiz) {
             polygon(poly[[i]], c(0, 0, 1, 1), col = col[i], border = NA)
         }
-        if (!horiz)
-        {
+        if (!horiz) {
             polygon(c(0, 0, 1, 1), poly[[i]], col = col[i], border = NA)
         }
     }

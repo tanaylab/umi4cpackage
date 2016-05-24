@@ -6,13 +6,13 @@ Authors@R: c(person("Amos", "Tanay", role=c("aut")),
 Description: Process UMI-4C data from scratch to produce nice plots.
 Depends:
     R (>= 3.0),
-    misha
+    misha,
+    zoo
 License: 
 Encoding: UTF-8
 LazyData: true
 Imports:
-    misha,
-    zoo
+    misha
 RoxygenNote: 5.0.1
 Suggests: knitr,
     rmarkdown
