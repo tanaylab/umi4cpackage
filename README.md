@@ -23,7 +23,7 @@ Since _misha_ package is not in CRAN, we will need to install it directly as fol
 Download the package from: [here.](http://compgenomics.weizmann.ac.il/tanay/?page_id=617).   
 Install the package:
 ```
-!#r
+#!r
 install.packages("misha_3.2.7.tar.gz", repos=NULL) #Installs misha package from file
 ```
 
