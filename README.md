@@ -37,7 +37,7 @@ library(umi4cPackage)
 ```
 
 #### Using the package
-Please refer to the package vignette for usage and complete step by step example.
+Please refer to the package vignette for usage and a complete step by step example.
 ```
 #!r
 vignette('umi4c-usage', package=umi4cPackage) 
