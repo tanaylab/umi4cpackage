@@ -19,8 +19,8 @@ The pipeline is designed to run on a standard linux machine. The basic requireme
 
 
 #### Installing misha package:
-Since _misha_ package is not in CRAN, we will need to install it directly as follow:  
-Download the package from: [here.](http://compgenomics.weizmann.ac.il/tanay/?page_id=617).   
+Since _misha_ package is not in CRAN, you will need to install it directly as follow:  
+Download the package from: [here.](http://compgenomics.weizmann.ac.il/tanay/?page_id=617)   
 Install the package:
 ```
 #!r
