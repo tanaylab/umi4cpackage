@@ -111,7 +111,7 @@ __Make sure that all newlines are linux compatible (\\n) and not windows (\\r\\n
 ## Importing and analyzing UMI-4C files.
 ### Initialization:
 We need to load the configuration files to our envirnoment by:
-```{r, eval=TRUE}
+```{r, eval=FALSE}
 p4cLoadConfFiles(conf_dir = "my_u4c_proj/conf")
 ```
 #### Working example:
@@ -134,19 +134,19 @@ After successfully importing the data, the pipeline will report some essential s
 These statistics can also be accessed from 4CQC.txt in the sample workdir directory.  
 
 Once imported the genomic tracks are saved in our trackdb, and can be listed by:  
-```{r, eval=TRUE}
+```r, eval=FALSE}
 gtrack.ls()
 ```
 
 #### Analyzing and plotting
 Now we can analyze the data:  
 Suppose we want to create an UMI-4C profile 200kb upstream and downstream the bait in our exmaple CMK experiment. The first step is to create `p4cProfile object`:
-```{r, eval=TRUE}
+```{r, eval=FALSE}
 CMK_fc <- p4cNewProfile("umi4C_example_CMK_ANK1_TSS", scope_5=200000, scope_3=200000)
 ```
 
 Plot nearcis profile:
-```{r}
+```{r, eval=FALSE}
 plot(CMK_fc)
 ```
 This command generates a plot of the 4C profile with a smoothed trend and a domainogram. It accepts some more parameters which are described in the function documentation: `?plot.p4cProfile`.  
@@ -165,7 +165,7 @@ Two new tracks were created. To list the tracks again by `gtrack.ls()`.
 
 After the tracks were imported we can produce comparative plots. For example, we will compare CMK
 which express _ANK1_ gene to _DND41_ which does not.
-```{r, message=FALSE}
+```{r, message=FALSE, eval=FALSE}
 # Generate a second p4cProfile on the same scope
 DND41_fc <- p4cNewProfile("umi4C_example_DND41_ANK1_TSS", scope_5=200000, scope_3=200000)
 
@@ -175,7 +175,7 @@ plot(CMK_fc, DND41_fc)
 
 Additional feature is the ability to derive mean contact intensity for defined genomic intervals. The following command will return normalized contact intensities of the two profiles, fold change, 
 and p-value (Chi-square test)
-```{r, message=FALSE}
+```{r, message=FALSE, eval=FALSE}
 fold_change <- p4cIntervalsMean(CMK_fc, DND41_fc, start=41665000, end=41675000)
 knitr::kable(fold_change, align = 'l', digits=2)
 ```
