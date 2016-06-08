@@ -40,5 +40,5 @@ library(umi4cPackage)
 Please refer to the package vignette for usage and a complete step by step example.
 ```
 #!r
-vignette('umi4c-usage', package=umi4cPackage) 
+vignette('umi4c-usage', package='umi4cPackage') 
 ```
