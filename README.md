@@ -32,7 +32,7 @@ install.packages("misha_3.2.7.tar.gz", repos=NULL) #Installs misha package from 
 Download and install *umi4cPackage*: 
 ```
 #!r
-devtools::install_bitbucket("tanaylab/umi4cpackage")
+devtools::install_bitbucket("tanaylab/umi4cpackage", ref='default')
 library(umi4cPackage)
 ```
 
