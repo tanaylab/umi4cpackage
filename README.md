@@ -24,7 +24,7 @@ Download the package from: [here.](http://compgenomics.weizmann.ac.il/tanay/?pag
 Install the package:
 ```
 #!r
-install.packages("misha_3.2.7.tar.gz", repos=NULL) #Installs misha package from file
+install.packages("misha_3.4.1.tar.gz", repos=NULL) #Installs misha package from file
 ```
 
 
