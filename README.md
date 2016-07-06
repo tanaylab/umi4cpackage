@@ -29,7 +29,7 @@ install.packages("http://www.wisdom.weizmann.ac.il/~omersch/misha_3.4.1.tar.gz",
 Download and install *umi4cPackage*: 
 ```
 #!r
-devtools::install_bitbucket("tanaylab/umi4cpackage", ref='default')
+devtools::install_bitbucket("tanaylab/umi4cpackage", ref='default', build_vignettes = TRUE)
 library(umi4cPackage)
 ```
 
