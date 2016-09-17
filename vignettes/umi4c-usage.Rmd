@@ -28,12 +28,12 @@ Genomic tracks are dynamically processed to produce nearcis profiles at the desi
 The pipeline is designed to run on a standard linux machine. The basic requirements are: 
 
 - _Perl_
-- _Bowtie2_: <http://bowtie-bio.sourceforge.net/bowtie2>.
-- Reference index for _Bowtie2_.
+- _Bowtie2_: <http://bowtie-bio.sourceforge.net/bowtie2>
+- Reference index for _Bowtie2_
 - R packages:
-    * _devtools_.
-    * _misha_.
-    * _zoo_.
+    * _devtools_
+    * _misha_
+    * _zoo_
 
 
 #### Installing misha package:
@@ -47,8 +47,13 @@ install.packages("misha_3.2.7.tar.gz", repos=NULL) #Installs misha package from 
 #### Importing UMI-4C package:
 Download and install _umi4cPackage_: 
 ```{r, eval=FALSE}
-devtools::install_bitbucket("tanaylab/umi4cpackage")
+devtools::install_bitbucket("tanaylab/umi4cpackage", ref='default')
 library(umi4cPackage)
+```
+
+Alternatively, install the package directly from the source:
+```{r, eval=FALSE}
+install.packages("umi4cPackage.tar.gz", repos=NULL)
 ```
   
 ##### Preparing genomic database

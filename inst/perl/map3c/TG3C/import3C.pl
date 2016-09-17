@@ -177,7 +177,7 @@ if ( $opt->get_opt( "TG3C.do_map", 1 ) ) {
     my ($sam_fn1) = "$wd/read1.sam";
     print STDERR "invoking bowtie2\n";
     my ($cmd) =
-"$bt2_bin -p $nthreads --reorder --$align_mode $bt2_ndx -U $fq_lst -S $sam_fn1 2>$wd/logs/bt.log";
+"$bt2_bin -p $nthreads --reorder --$align_mode -x $bt2_ndx -U $fq_lst -S $sam_fn1 2>$wd/logs/bt.log";
 
     $ret = system($cmd);
     if ($ret) { die "\nERROR:\n===================\nbowtie mapping failed\n"; }
