@@ -97,7 +97,7 @@ p4cLoadConfFiles <- function(conf_dir,
     
     .checkConf()
     gset_input_mode(autocompletion = FALSE, interactive = FALSE)
-    gsetroot(getOption("TG3C.trackdb"))
+    gsetroot(getOption("TG3C.trackdb"), rescan = TRUE)
 
     invisible()
 }
@@ -174,7 +174,7 @@ p4cCreate4CseqTrack = function(sample_ids = NULL, track_desc = "4C track",  verb
     
     if (is.null(groot))
     {
-        gsetroot(trackdb_path)
+        gsetroot(trackdb_path, rescan = TRUE)
         message("Will write tracks to ", trackdb_path)
     }
     
@@ -300,20 +300,25 @@ p4cCreate4CseqTrack = function(sample_ids = NULL, track_desc = "4C track",  verb
 
 ################################
 # Function used to create redb tracks for other reseqs
+# Not ready yet!
 ################################
 gtrack.create_redb_tracks = function(re_seq, redb_params_fn, verbose = FALSE)
 {
     options(gparam.type = "string")
     Sys.setenv(PERL_BADLANG = 0)
-    params = init_params(redb_params_fn)
+    op.new = init_params(redb_params_fn)
+    options(op.new)
     
-    gen_re_frags_pl = get_param("TG3C.gen_re_frags_pl", params)
-    re_frags_to_fends_pl = get_param("TG3C.re_frags_to_fends_pl", params)
-    mapab_track = get_param("TG3C.mapab_track", params)
-    re_workdir = get_param("TG3C.re_workdir", params)
-    chrom_key = get_param("TG3C.chrom_seq_key", params)
+    gen_re_frags_pl = getOption("TG3C.gen_re_frags_pl", NA)
+    re_frags_to_fends_pl = getOption("TG3C.re_frags_to_fends_pl", NA)
+    mapab_track = getOption("TG3C.mapab_track", NA)
+    re_workdir = getOption("TG3C.re_workdir", NA)
+    chrom_key = getOption("TG3C.chrom_seq_key", NA)
     
-    if (TG3C_miss_conf_err == TRUE)
+    # Check existance
+    all_set <- all(is.na(c(gen_re_frags_pl, re_frags_to_fends_pl, mapab_track, re_workdir, chrom_key)))
+    
+    if (!all_set)
     {
         message("ERROR: missing configuration options\n")
         return(NA)
