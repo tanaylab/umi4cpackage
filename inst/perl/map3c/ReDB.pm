@@ -87,8 +87,10 @@ sub build_from_genome {
 	while(<KEY>) {
 		chop;
 		my($chrom, $fn) = split("\t", $_);
+        $chrom =~ s/chr//;
+
 		print STDERR "will proc $chrom\n";
-		open(SEQ, $fn) || die "cannot opem crhom $chrom seq at $fn\n";
+		open(SEQ, $fn) || die "cannot open chrom $chrom seq at $fn\n";
 		my($seq) = "";
 		<SEQ>;
 		while(<SEQ>) {
