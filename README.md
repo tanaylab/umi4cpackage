@@ -1,6 +1,6 @@
 # Umi4C Package #
 
-Welcome to umi4cPackage Bitbucket repository.
+Welcome to umi4cPackage Github repository.
 
 ### What is umi4cPackage? ###
 umi4cPackage is a processing and analysis pipeline for UMI-4C experiment. 
