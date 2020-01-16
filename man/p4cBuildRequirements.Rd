@@ -19,4 +19,3 @@ p4cBuildRequirements(output_dir, genome = "hg19", reseq = "GATC",
 Downloads the required datasets for the package: trackdb and redb. These datasets
 include a genomic database in a binary format and restriction sites tables in text format.
 }
-

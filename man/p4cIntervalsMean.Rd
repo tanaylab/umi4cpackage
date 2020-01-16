@@ -5,7 +5,7 @@
 \title{Compare contacts intensities between two profiles}
 \usage{
 p4cIntervalsMean(p4c_obj, ref_p4c_obj, start, end, min_win_cov = 30,
-  rawdata = FALSE, max_scope = 1000000)
+  rawdata = FALSE, max_scope = 1e+06)
 }
 \arguments{
 \item{p4c_obj}{A \code{p4cProfile} object.}
@@ -32,4 +32,3 @@ The p-value is calculated for the entire interval with a chi-square test. Howeve
 it assumes the interval is <1Mb from the bait. If the interval is >1Mb from the bait
  \code{max_scope} should be increased accordingly.
 }
-

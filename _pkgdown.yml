@@ -1,0 +1,14 @@
+navbar:
+  title: "umi4c"
+  type: inverse
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "Usage"
+      href: articles/umi4c-usage.html
+      icon: fa-road
+    - text: "Reference"
+      href: reference/index.html
+      icon: fa-th-list
+
+

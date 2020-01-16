@@ -36,24 +36,11 @@ The pipeline is designed to run on a standard linux machine. The basic requireme
     * _zoo_
 
 
-#### Installing misha package:
-Since _misha_ package is not in CRAN, we will need to install it directly as follow:  
-Download the package from: <http://compgenomics.weizmann.ac.il/tanay/?page_id=617>.   
-Install the package:
-```{r, eval=FALSE}
-install.packages("misha_3.2.7.tar.gz", repos=NULL) #Installs misha package from file
-```
-
-#### Importing UMI-4C package:
+#### Installation
 Download and install _umi4cPackage_: 
 ```{r, eval=FALSE}
-devtools::install_bitbucket("tanaylab/umi4cpackage", ref='default')
+devtools::install_github("tanaylab/umi4cpackage", vignette = TRUE)
 library(umi4cPackage)
-```
-
-Alternatively, install the package directly from the source:
-```{r, eval=FALSE}
-install.packages("umi4cPackage.tar.gz", repos=NULL)
 ```
   
 ##### Preparing genomic database

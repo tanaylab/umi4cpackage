@@ -19,4 +19,3 @@ p4cExportBedGraph(p4c_obj, filename, min_win_cov = 50, color = "black")
 \code{p4cExportBedGraph} exports the smoothed trend to a file which can be imported as a 'custom track'
 to the UCSC genome browser.
 }
-

@@ -4,8 +4,8 @@
 \alias{p4cLoadConfFiles}
 \title{Load all the config files required for the package.}
 \usage{
-p4cLoadConfFiles(conf_dir, paths_conf = file.path(conf_dir, "paths.conf"),
-  pipeline_conf = file.path(conf_dir, "pipeline.conf"),
+p4cLoadConfFiles(conf_dir, paths_conf = file.path(conf_dir,
+  "paths.conf"), pipeline_conf = file.path(conf_dir, "pipeline.conf"),
   p4c_conf = file.path(conf_dir, "p4c.conf"))
 }
 \arguments{
@@ -22,4 +22,3 @@ files as those that were exported with \code{p4cDumpConfFiles}.}
 Loads the config files which were filled by the user. Accepts either directory path
 from \code{conf_dir}, or individual files supplied by the other parameters.
 }
-

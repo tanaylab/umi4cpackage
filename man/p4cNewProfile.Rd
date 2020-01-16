@@ -4,9 +4,9 @@
 \alias{p4cNewProfile}
 \title{Create a new p4cProfile object.}
 \usage{
-p4cNewProfile(track_nm, bait_chrom = gtrack.attr.get(track_nm[1], "Bait_chr"),
-  bait_start = as.numeric(gtrack.attr.get(track_nm[1], "Bait_coord")),
-  scope_5 = 250000, scope_3 = 250000, stat_type)
+p4cNewProfile(track_nm, bait_chrom = gtrack.attr.get(track_nm[1],
+  "Bait_chr"), bait_start = as.numeric(gtrack.attr.get(track_nm[1],
+  "Bait_coord")), scope_5 = 250000, scope_3 = 250000, stat_type)
 }
 \arguments{
 \item{track_nm}{2D genomic track name. Can also be a character vector of track
@@ -34,4 +34,3 @@ Returns a p4cProfile object.
 This function is the primary object constructor. It processes a 2D genomic track 
 with (UMI)-4C raw contact data and returns a p4cProfile object.
 }
-

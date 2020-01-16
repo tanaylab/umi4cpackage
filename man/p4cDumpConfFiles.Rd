@@ -12,4 +12,3 @@ p4cDumpConfFiles(conf_dir)
 \description{
 Dump templates of config files required by the package.
 }
-

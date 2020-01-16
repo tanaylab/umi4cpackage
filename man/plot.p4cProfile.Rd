@@ -2,8 +2,8 @@
 % Please edit documentation in R/p4c_package.R
 \name{plot.p4cProfile}
 \alias{plot.p4cProfile}
-\alias{plotCompProf}
 \alias{plotSingleProf}
+\alias{plotCompProf}
 \title{Plot 4C nearcis profile.}
 \usage{
 \method{plot}{p4cProfile}(p4c_obj1, p4c_obj2, trend_scale = "adaptive",
@@ -12,8 +12,8 @@
 plotSingleProf(p4c_obj, trend_scale, png_fn, plot.colorbar, add.func, xlim,
   ylim, trend_only, main, sd, ...)
 
-plotCompProf(p4c_obj1, ref_p4c_obj, trend_scale, png_fn, col, min_win_cov, xlim,
-  zlim, legend.text, ylim, dgram.method, main, sd)
+plotCompProf(p4c_obj1, ref_p4c_obj, trend_scale, png_fn, col, min_win_cov,
+  xlim, zlim, legend.text, ylim, dgram.method, main, sd)
 }
 \arguments{
 \item{p4c_obj1}{p4cProfile object created by \code{p4cNewProfile}.}
@@ -79,4 +79,3 @@ plot(fc, fc_cond2, col=c('red', 'blue'), min_win_cov=100, main = '4C figure', pn
 }
 
 }
-
