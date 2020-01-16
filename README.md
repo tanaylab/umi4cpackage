@@ -18,15 +18,7 @@ The pipeline is designed to run on a standard linux machine. The basic requireme
     * _zoo_.
 
 
-#### Installing misha package:
-```
-#!r
-install.packages("http://www.wisdom.weizmann.ac.il/~omersch/misha_3.4.1.tar.gz", repos=NULL) # Download and install misha package
-```
-
-
-#### Importing UMI-4C package:
-Download and install *umi4cPackage*: 
+#### Installation
 ```
 #!r
 devtools::install_github("tanaylab/umi4cpackage", vignette = TRUE)
