@@ -120,7 +120,7 @@ After successfully importing the data, the pipeline will report some essential s
 These statistics can also be accessed from 4CQC.txt in the sample workdir directory.  
 
 Once imported the genomic tracks are saved in our trackdb, and can be listed by:  
-```r, eval=FALSE}
+```{r, eval=FALSE}
 gtrack.ls()
 ```
 
