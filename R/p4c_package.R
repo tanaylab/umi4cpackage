@@ -145,6 +145,7 @@ summary.p4cProfile <- function(p4c_obj)
 #' @param legend.text Character vector with length 2. Controls the text in the color legend of the trendline.
 #'  The default are the names of the profiles.    
 #' @param col Vector with length 2 that controls the colors of each profile in a comparative plot. 
+#' @param trend_only Optional. Logical that defines whether only the trend plot should be displayed.
 #' 
 #' @examples 
 #' \donttest{
@@ -332,8 +333,13 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NULL, trend_scale = "ada
     # plot main trend
     lines(coords, trend, type = "l", lwd = 3, col = "black")
     
-    if (trend_only) 
+    if (trend_only){
+        if (!is.null(png_fn))
+        {
+            dev.off()
+        }
         return()
+    }
     
     # plot dgram
     par(mar = c(4, 4, 0, 2))
@@ -404,9 +410,10 @@ plotCompProf <- function(p4c_obj1, ref_p4c_obj, trend_scale, png_fn, col, min_wi
     xlim, zlim, legend.text, ylim, dgram.method, main, sd) UseMethod("plotCompProf")
 
 #' @export
-plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adaptive", 
-    png_fn = NULL, col = c("red", "black"), min_win_cov = 50, xlim, zlim = c(-1.5, 
-        1.5), legend.text, ylim, dgram.method = "delta", main, sd = 2, ...)
+plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adaptive",
+        png_fn = NULL, col = c("red", "black"), 
+        min_win_cov = 50, xlim, zlim = c(-1.5, 1.5), legend.text, ylim, 
+        dgram.method = "delta", main, sd = 2, trend_only = FALSE, ...)
         {
     # normalize p4c_obj1 to p4c_obj2
     p4c_obj1 <- .p4cNormDgram(p4c_obj1, ref_p4c_obj)
@@ -432,7 +439,10 @@ plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adapti
             res = p4c_obj1$figure_params$png_res)
     }
     
-    layout(matrix(1:3, nrow = 3), heights = c(2.5, 0.2, 2))
+    if(!trend_only)
+    {
+        layout(matrix(1:3, nrow = 3), heights = c(2.5, 0.2, 2))
+    }
     par(cex = 1)
     par(mar = c(0, 4, 0, 2))
     par(oma = c(2, 0.4, 1, 0.4))
@@ -487,6 +497,14 @@ plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adapti
     
     if (!missing(main)) 
         title(main = main)
+    
+    if (trend_only){
+        if (!is.null(png_fn))
+        {
+            dev.off()
+        }
+        return()
+    }
     
     par(mar = c(0, 4, 0, 2))
     
