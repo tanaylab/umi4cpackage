@@ -274,7 +274,7 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NULL, trend_scale = "ada
         write(header_line2, filename1, append = T)
     
         bed_df <- data.frame(chrom = paste0("chr", gsub("chr", "", p4c_obj$bait$chrom)), 
-            start = round(coords), end = round(coords), 
+            start = round(coords), end = round(coords) + 1, 
             value = trend)
     
         write.table(bed_df, filename1, append = T, quote = F, col.names = F, row.names = F, sep="\t")
@@ -470,7 +470,7 @@ plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adapti
         write(header_line2, filename1, append = T)
     
         bed_df <- data.frame(chrom = paste0("chr", gsub("chr", "", p4c_obj1$bait$chrom)), 
-            start = round(coords), end = round(coords), 
+            start = round(coords), end = round(coords) + 1, 
             value = trend1)
     
         write.table(bed_df, filename1, append = T, quote = F, col.names = F, row.names = F, sep="\t")
@@ -490,7 +490,7 @@ plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adapti
         write(header_line2, filename2, append = T)
     
         bed_df <- data.frame(chrom = paste0("chr", gsub("chr", "", p4c_obj1$bait$chrom)), 
-            start = round(coords), end = round(coords), 
+            start = round(coords), end = round(coords) + 1, 
             value = ref_trend)
     
         write.table(bed_df, filename2, append = T, quote = F, col.names = F, row.names = F, sep="\t")
