@@ -136,7 +136,7 @@ summary.p4cProfile <- function(p4c_obj)
 #'  current graphic device.
 #' @param plot.colorbar Optional. Logical that defines whether a colorbar for the domainogram 
 #'  should be plotted.
-#' @param xlim Similar to R basic grphics. A two elements vector that controls the genomic 
+#' @param xlim Similar to R basic graphics. A two elements vector that controls the genomic 
 #'  focus of the plot (X axis). 
 #' @param ylim Similar to R basic graphics. A two elements vector that controls the trendline
 #'  ylim (In units of molecules).
@@ -145,6 +145,9 @@ summary.p4cProfile <- function(p4c_obj)
 #' @param legend.text Character vector with length 2. Controls the text in the color legend of the trendline.
 #'  The default are the names of the profiles.    
 #' @param col Vector with length 2 that controls the colors of each profile in a comparative plot. 
+#' @param trend_only Optional. Logical that defines whether only the trend plot should be displayed.
+#' @param filename1 Optional. File for the bedgraph with the trendline of `p4c_obj1`
+#' @param filename2 Optional. File for the bedgraph with the trendline of `p4c_obj2`
 #' 
 #' @examples 
 #' \donttest{
@@ -189,7 +192,7 @@ plotSingleProf <- function(p4c_obj, trend_scale, png_fn, plot.colorbar, add.func
 #' @export
 plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NULL, trend_scale = "adaptive", 
     ref_track_nm = NA, min_win_cov = 50, plot.colorbar = FALSE, add.func, xlim, ylim, 
-    trend_only = FALSE, main, sd = 2, ...)
+    trend_only = FALSE, main, sd = 2, filename1, ...)
     {
     if (trend_scale != "adaptive" & !is.numeric(trend_scale))
     {
@@ -236,6 +239,9 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NULL, trend_scale = "ada
         coords <- coords[trend_scale:(n - trend_scale)]
         dgram <- dgram[trend_scale:(n - trend_scale), ]  #truncate the margins of the dataframe to remove NAs
         trend <- dgram[, trend_scale_idx]
+        cur_desc <- sprintf("%s _ UMI-4C track smoothed values in scope (fixed trend scale: %i fragments)",
+            cur_name, trend_scale)
+        track_name <- paste0(cur_name,"_smoothed",trend_scale,"frags")
         message("fixed trend scale: ", trend_scale)
     } else if (trend_scale == "adaptive")
     {
@@ -249,10 +255,31 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NULL, trend_scale = "ada
         }
         coords <- p4c_obj$smoothedTrend$start
         trend <- p4c_obj$smoothedTrend$trend
+        cur_desc <- sprintf("%s _ UMI-4C track smoothed values in scope (min coverage - %i molecules)", 
+            cur_name, min_win_cov)
+        track_name <- paste0(cur_name,"_smoothedMin",min_win_cov,"mols")
     }
     
     trend <- trend[!is.na(coords)]
     coords <- na.omit(coords)
+
+    if(!missing(filename1)){
+        cur_name <- p4c_obj$track_nm
+        cur_col <- paste((col2rgb(col)), collapse = ",")
+        header_line1 <- sprintf("browser position %s:%i-%i", paste0("chr", gsub("chr", 
+            "", p4c_obj$bait$chrom)), coords[1], tail(coords, 1))
+        header_line2 <- sprintf("track type=bedGraph name=\"%s\" description=\"%s\" color=%s", 
+            track_name, cur_desc, cur_col)
+        write(header_line1, filename1)
+        write(header_line2, filename1, append = T)
+    
+        bed_df <- data.frame(chrom = paste0("chr", gsub("chr", "", p4c_obj$bait$chrom)), 
+            start = round(coords), end = round(coords) + 1, 
+            value = trend)
+    
+        write.table(bed_df, filename1, append = T, quote = F, col.names = F, row.names = F, sep="\t")
+        message("Wrote bedGraph file for ",cur_name," to ", filename1)
+    }
     
     if (!is.null(png_fn))
     {
@@ -332,8 +359,13 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NULL, trend_scale = "ada
     # plot main trend
     lines(coords, trend, type = "l", lwd = 3, col = "black")
     
-    if (trend_only) 
+    if (trend_only){
+        if (!is.null(png_fn))
+        {
+            dev.off()
+        }
         return()
+    }
     
     # plot dgram
     par(mar = c(4, 4, 0, 2))
@@ -404,10 +436,16 @@ plotCompProf <- function(p4c_obj1, ref_p4c_obj, trend_scale, png_fn, col, min_wi
     xlim, zlim, legend.text, ylim, dgram.method, main, sd) UseMethod("plotCompProf")
 
 #' @export
-plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adaptive", 
-    png_fn = NULL, col = c("red", "black"), min_win_cov = 50, xlim, zlim = c(-1.5, 
-        1.5), legend.text, ylim, dgram.method = "delta", main, sd = 2, ...)
+plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adaptive",
+        png_fn = NULL, col = c("red", "black"), 
+        min_win_cov = 50, xlim, zlim = c(-1.5, 1.5), legend.text, ylim, 
+        dgram.method = "delta", main, sd = 2, filename1, filename2,
+        trend_only = FALSE, ...)
         {
+    if (trend_scale != "adaptive"){
+        message("Only the trend scale adaptive is currently supported in plot",
+            " when 2 p4cProfiles are provided.")
+    }
     # normalize p4c_obj1 to p4c_obj2
     p4c_obj1 <- .p4cNormDgram(p4c_obj1, ref_p4c_obj)
     
@@ -417,6 +455,47 @@ plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adapti
     coords <- comp_list$trend_mat$start
     trend1 <- comp_list$trend_mat$p4c_obj1
     ref_trend <- comp_list$trend_mat$ref_p4c_obj
+    
+    if(!missing(filename1)){
+        cur_name <- p4c_obj1$track_nm
+        cur_col <- paste((col2rgb(col[1])), collapse = ",")
+        cur_desc <- sprintf("%s _ UMI-4C track smoothed values in scope (min coverage - %i molecules) when norm to %s",
+            cur_name, min_win_cov,ref_p4c_obj$track_nm)
+        track_name <- paste0(cur_name,"_smoothedMin",min_win_cov,"mols_normTo",ref_p4c_obj$track_nm)
+        header_line1 <- sprintf("browser position %s:%i-%i", paste0("chr", gsub("chr", 
+            "", p4c_obj1$bait$chrom)), coords[1], tail(coords, 1))
+        header_line2 <- sprintf("track type=bedGraph name=\"%s\" description=\"%s\" color=%s", 
+            track_name, cur_desc, cur_col)
+        write(header_line1, filename1)
+        write(header_line2, filename1, append = T)
+    
+        bed_df <- data.frame(chrom = paste0("chr", gsub("chr", "", p4c_obj1$bait$chrom)), 
+            start = round(coords), end = round(coords) + 1, 
+            value = trend1)
+    
+        write.table(bed_df, filename1, append = T, quote = F, col.names = F, row.names = F, sep="\t")
+        message("Wrote bedGraph file for ",cur_name," to ", filename1)
+    }
+    if(!missing(filename2)){
+        cur_name <- ref_p4c_obj$track_nm
+        cur_col <- paste((col2rgb(col[2])), collapse = ",")
+        cur_desc <- sprintf("%s _ UMI-4C track smoothed values in scope (min coverage - %i molecules)", 
+            cur_name, min_win_cov)
+        track_name <- paste0(cur_name,"_smoothedMin",min_win_cov,"mols_toNorm",p4c_obj1$track_nm)
+        header_line1 <- sprintf("browser position %s:%i-%i", paste0("chr", gsub("chr", 
+            "", p4c_obj1$bait$chrom)), coords[1], tail(coords, 1))
+        header_line2 <- sprintf("track type=bedGraph name=\"%s\" description=\"%s\" color=%s", 
+            track_name, cur_desc, cur_col)
+        write(header_line1, filename2)
+        write(header_line2, filename2, append = T)
+    
+        bed_df <- data.frame(chrom = paste0("chr", gsub("chr", "", p4c_obj1$bait$chrom)), 
+            start = round(coords), end = round(coords) + 1, 
+            value = ref_trend)
+    
+        write.table(bed_df, filename2, append = T, quote = F, col.names = F, row.names = F, sep="\t")
+        message("Wrote bedGraph file for ",cur_name," to ", filename2)
+    }
     
     if (missing(xlim)) 
         xlim = range(coords, na.rm = T)
@@ -432,7 +511,10 @@ plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adapti
             res = p4c_obj1$figure_params$png_res)
     }
     
-    layout(matrix(1:3, nrow = 3), heights = c(2.5, 0.2, 2))
+    if(!trend_only)
+    {
+        layout(matrix(1:3, nrow = 3), heights = c(2.5, 0.2, 2))
+    }
     par(cex = 1)
     par(mar = c(0, 4, 0, 2))
     par(oma = c(2, 0.4, 1, 0.4))
@@ -487,6 +569,14 @@ plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adapti
     
     if (!missing(main)) 
         title(main = main)
+    
+    if (trend_only){
+        if (!is.null(png_fn))
+        {
+            dev.off()
+        }
+        return()
+    }
     
     par(mar = c(0, 4, 0, 2))
     
@@ -658,37 +748,97 @@ p4cIntervalsMean <- function(p4c_obj, ref_p4c_obj, start, end, min_win_cov = 30,
 }
 #' Export bedGraph
 #' 
-#' \code{p4cExportBedGraph} exports the smoothed trend to a file which can be imported as a 'custom track'
-#' to the UCSC genome browser.
+#' \code{p4cExportBedGraph} exports the smoothed trend with an adaptative or a fixed smoothing window
+#' to a file which can be imported as a 'custom track' to the UCSC genome browser.
 #' 
 #' @param p4c_obj \code{p4cProfile} object
 #' @param filename Filename of the bedGraph.
-#' @param min_win_cov Smoothing parameter.
+#' @param trend_scale This parameter controls the smoothing method for the trendline. Either 
+#'  'adaptive' (default), or, for fixed window trend, an integer with the desired size 
+#'  of the window (in restriction fragments units), put 0 for the raw molecule number.
+#' @param min_win_cov If the default smoothing method is used ('adaptive'), this parameter
+#'  controls the window size by requiring that no less than \code{min_win_cov} molecules will be included
+#'  in that genomic window.
 #' @param color Color of the bedGraph plot.
 #' 
 #' @export
 p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "black")
 {
+    # Check that the parameters are valid
+    if (trend_scale != "adaptive" & !is.numeric(trend_scale))
+    {
+        stop("illegal trend scale ", trend_scale)
+    }
+    # Check that the requested trend_scale is part of the dgram_scales
+    if (is.numeric(trend_scale) & !trend_scale %in% c(0,p4c_obj$dgram_params$dgram_scales))
+    {
+        stop("trend_scale was not generated for ", trend_scale, ": set dgram_scales in p4c.conf")
+    }
+    
     cur_name <- p4c_obj$track_nm
-    cur_desc <- sprintf("UMI-4C track smoothed values in scope (min coverage - %i molecules)", 
-        min_win_cov)
     cur_col <- paste((col2rgb(color)), collapse = ",")
-    
-    cur_obj <- .p4cSmoothedTrend(p4c_obj, min_win_cov)
-    
+
+    # Get the data:
+    if (is.numeric(trend_scale))
+    {
+        # access dgram table
+        dgram <- p4c_obj$dgram
+        # Get the coordinates
+        coords <- dgram[, 1]
+        bait_x <- p4c_obj$bait$start
+        # Define the index of the desired trend_scale in the dgram matrix
+        # If needed, update the coordinates
+        # As well as a track_name and description
+        if (trend_scale == 0)
+        {
+            trend_scale_idx <- 2
+            cur_desc <- sprintf("%s _ UMI-4C track raw values in scope", cur_name)
+            track_name <- paste0(cur_name,"_raw")
+            message("bedgraph with raw values.")
+        } else
+        {
+            trend_scale_idx <- which(p4c_obj$dgram_params$dgram_scales == trend_scale) + 2
+            # Update the coordinates to use geomean coordinates
+            coords <- p4cWinGeoMeanCoordinate(coords, trend_scale * 2, bait_x)
+            n <- length(dgram[, 1])
+            # Restrict to inside values to remove NAs
+            coords <- coords[trend_scale:(n - trend_scale)]
+            dgram <- dgram[trend_scale:(n - trend_scale), ]
+            cur_desc <- sprintf("%s _ UMI-4C track smoothed values in scope (fixed trend scale: %i fragments)",
+                cur_name, trend_scale)
+            track_name <- paste0(cur_name,"_smoothed",trend_scale,"frags")
+            message("fixed trend scale: ", trend_scale)
+        }
+        # Extract the trend values
+        trend <- dgram[, trend_scale_idx]
+    } else if (trend_scale == "adaptive")
+    {
+        if ("smoothedTrend" %in% names(p4c_obj))
+        {
+            message("trend is adaptive")
+        } else
+        {
+            message("Will create smoothed trend for track with min_win_cov = ", min_win_cov)
+            p4c_obj <- .p4cSmoothedTrend.p4cProfile(p4c_obj, min_win_cov)
+        }
+        coords <- p4c_obj$smoothedTrend$start
+        trend <- p4c_obj$smoothedTrend$trend
+        cur_desc <- sprintf("%s _ UMI-4C track smoothed values in scope (min coverage - %i molecules)", 
+            cur_name, min_win_cov)
+        track_name <- paste0(cur_name,"_smoothedMin",min_win_cov,"mols")
+    }
     header_line1 <- sprintf("browser position %s:%i-%i", paste0("chr", gsub("chr", 
-        "", cur_obj$bait$chrom)), cur_obj$smoothedTrend$start[1], tail(cur_obj$smoothedTrend$start, 
-        1))
+        "", p4c_obj$bait$chrom)), round(coords[1]), round(tail(coords, 1)))
     header_line2 <- sprintf("track type=bedGraph name=\"%s\" description=\"%s\" color=%s", 
-        cur_name, cur_desc, cur_col)
+        track_name, cur_desc, cur_col)
     write(header_line1, filename)
     write(header_line2, filename, append = T)
     
-    bed_df <- data.frame(chrom = paste0("chr", gsub("chr", "", cur_obj$bait$chrom)), 
-        start = round(cur_obj$smoothedTrend$start), end = round(cur_obj$smoothedTrend$start), 
-        value = cur_obj$smoothedTrend$trend)
+    bed_df <- data.frame(chrom = paste0("chr", gsub("chr", "", p4c_obj$bait$chrom)), 
+        start = round(coords), end = round(coords) + 1, 
+        value = trend)
     
-    write.table(bed_df, filename, append = T, quote = F, col.names = F, row.names = F)
+    write.table(bed_df, filename, append = T, quote = F, col.names = F, row.names = F, sep="\t")
     message("Wrote bedGraph file to ", filename)
 }
 
