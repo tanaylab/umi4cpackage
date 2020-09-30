@@ -1,0 +1,201 @@
+---
+title: "Create a new database for umi4cPackage"
+author: 
+  - Omer Schwartzman
+  - Aviezer Lifshitz
+  - Lucille Lopez-Delisle
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{NewDBForumi4cPackage}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+UMI-4C Package is a processing and analysis pipeline for UMI-4C experiments. Some databases have been computed and are accessible via download. However, sometimes the database you need is not available and you need to create a new one. This vignette will guide you to create a new database.
+
+## Background
+To create a new genomic database, you will need:
+
+- __A fasta file (one per chromosome) where file begins with 'chr' and each chromosome name also begins with 'chr'.__
+- __Optionnally a mappability bedgraph where values goes from 0 to 5.__
+A section is dedicated to ways to get this mappability bedgraph
+
+## Get the inputs
+### Requirements:
+The pipeline is designed to run on a standard linux machine. The basic requirements are: 
+
+- _Perl_
+- R packages:
+    * _devtools_
+    * _misha_
+    * _umi4cPackage_
+
+#### Install the R dependencies
+```{r, eval=FALSE}
+# Install devtools if not installed
+if(!require(devtools)){
+  install.packages("devtools")
+}
+# Install misha if not installed
+if(!require(misha)){
+  install.packages('misha', repos=c(getOption('repos'),       'https://tanaylab.github.io/repo'))
+}
+# Install umi4cPackage if not installed
+if(!require(umi4cPackage)){
+  devtools::install_github("tanaylab/umi4cpackage", vignette = TRUE)
+}
+```
+
+### Fasta files
+Most of genomes are available on UCSC where you can download them through the [download page](http://hgdownload.cse.ucsc.edu/downloads.html) in the section __Genome sequence files and select annotations__. You can also download them by the link:
+```{bash, eval=FALSE}
+genome=mm10
+wget http://hgdownload.cse.ucsc.edu/goldenPath/${genome}/bigZips/${genome}.fa.gz
+```
+
+To create a new database, you need one file per chromosome. To split your file, you can use awk:
+```{bash, eval=FALSE}
+genome=mm10
+mkdir -p $genome
+zcat ${genome}.fa.gz | awk -v dir=$genome '$0~"^>"{id = $1; gsub("^>", "", id)}{print >> dir"/"id".fa"}'
+```
+
+In some assemblies there are a lot of contigs or there are alternate contigs and you may be interested in keeping only some of them (for example only the numbered chromosome, the sexual and the mitochondrion).
+
+You can remove the one you don't want from the new folder created, for example:
+```{bash, eval=FALSE}
+rm ${genome}/*random
+rm ${genome}/chrUn*
+rm ${genome}/*_alt
+```
+
+### Build a mappability bedgraph
+As written above, you can provide a mappability bedgraph. This is not mandatory, alternatively you can arbitrary decide that all genome is fully mappable.
+
+One way to get the mappability track is to use [gem2](Link to the home page). You can install it through conda:
+```{bash, eval=FALSE}
+conda install -c bioconda gem2
+```
+or download the source:
+```{bash, eval=FALSE}
+wget https://paoloribeca.science/gem/gem2.INEEDTOCHECK.Linux-amd64.tar.xz
+tar xvf gem2.INEEDTOCHECK.Linux-amd64.tar.xz
+export PATH=$PATH:$PWD/gem2.INEEDTOCHECK.Linux-amd64
+```
+
+You need to have a single fasta file. If you selected only some chromosomes, you need to concatenate them:
+```{bash, eval=FALSE}
+cat ${genome}/*.fa > ${genome}_simplified.fa
+```
+
+Then you need to create an index:
+```{bash, eval=FALSE}
+nbThreads=28
+fastaFile=${genome}_simplified.fa # or ${genome}.fa.gz if you did not select chromosomes
+gem-indexer -T ${nbThreads} -c dna -i ${fastaFile} -o ${genome}_index
+```
+
+You need to decide a size for the kmer to compute mappability (we recommand 50).
+```{bash, eval=FALSE}
+kmer=50
+gem-mappability -T ${nbThreads} -I ${genome}_index.gem -l ${kmer} -o ${genome}_${kmer}
+```
+
+Finally you need to convert the mappability file to bedgraph
+```{bash, eval=FALSE}
+gem-2-bed mappability -I ${genome}_index.gem -i ${genome}_${kmer}.mappability -o ${genome}_${kmer}
+```
+
+## Build the genomic database
+The pipeline requires a special database called _trackdb_ which contains binary genomic tracks and other data, as well as restriction site database in text format called _redb_.  
+
+### Initiate the database
+From _R_ we will create a genome database (the _trackdb_ folder) using individual fasta files. All fasta files must begin by "chr".
+```{r, eval=FALSE}
+library("misha")
+genome <- "mm10"
+gdb.create("my_genome/trackdb", file.path(genome, "chr*.fa"))
+```
+
+You set this new database as your current database:
+```{r, eval=FALSE}
+gdb.init("my_genome/trackdb")
+```
+
+### Put mappability track
+We will now create a track with the mappability.
+
+- If you did not compute any mappability bedgraph:
+```{r, eval=FALSE}
+gtrack.create(track="my_mappab", description="mappab set to 5",
+              expr="5", iterator = 10,
+              band = NULL)
+```
+
+- If you computed the mappability with gem or any other way and you have a bedgraph:
+```{r, eval=FALSE}
+mapab_fn <- paste0(genome, "_50.bg")
+# Create a track from the bedgraph
+gtrack.import(track="mappab_from_file", description="mappability from gem",
+              file=mapab_fn, 10)
+# Get the maxiumum value (1 with gem):
+max.value <- gsummary("mappab_from_file")["Max"]
+# Create a new track with the values scaled to get max at 5:
+gtrack.create(track="my_mappab", description="mappab from gem scaled to 5",
+              expr=paste("mappab_from_file * 5 /", max.value), iterator = 10,
+              band = NULL)
+
+```
+
+### Create the redb tracks
+
+#### Build the chromosome_key table
+
+To create a redb you need to provide a tabulation-delimited file which provide the list of chromosomes and the path to the sequence.
+```{r, eval=FALSE}
+seq.files <- list.files(file.path(GROOT, "seq"))
+seq.names <- sapply(seq.files, function(fn){gsub("^chr", "", 
+                                                 gsub("\\.seq$", "", fn))})
+seq.key.df <- data.frame(names = seq.names,
+                         files = file.path(GROOT, "seq", seq.files))
+write.table(seq.key.df, "chrom_key.txt", sep ="\t",
+            row.names = F, col.names = F, quote = F)
+```
+
+
+#### Configuration file
+
+The next step is to set up the _conf_ file. To do so we will first need to dump templates of conf files to a conf directory:
+```{r, eval=FALSE, warning=FALSE}
+library(umi4cPackage)
+p4cDumpConfFiles(conf_dir = "my_genome/conf")
+```
+
+Now we will need to go to the supplied directory (`my_genome/conf` in our case) and complete the _redb.conf_ file.  
+__Make sure that all newlines are linux compatible (\\n) and not windows (\\r\\n)!__  
+
+- __TG3C.mapab_track__: Set the name of the mappability track
+- __TG3C.re_workdir__: Set the path to the redb directory
+- __TG3C.chrom_seq_key__: Set the path to the chomosome_key table created above.
+
+#### Create the db
+
+Now you need to create a database specific to the restriction enzyme you used.
+```{r, eval=FALSE, warning=FALSE}
+# For example, DpnII:
+gtrack.create_redb_tracks = function(re_seq="GATC", redb_params_fn="my_genome/conf/redb.conf")
+```
+
+After this, you should have two directories that contains all files necessary to do the umi4c analysis:  
+
+- __my_genome/trackdb__  
+- __my_genome/redb__
+
+You can keep a copy of this new database, for example creating an archive:
+```{bash, eval=FALSE}
+genome=mm10
+tar -zcvf ${genome}_umi4c_db.tar.gz my_genome/redb my_genome/trackdb
+```
+
+When you want to use this new db, don't forget to use the good path in __paths.conf__ file for variables __TG3C.trackdb__ and __TG3C.redb__.
