@@ -37,6 +37,17 @@ The pipeline is designed to run on a standard linux machine. The basic requireme
 
 
 #### Installation
+Install the r dependencies: 
+```{r, eval=FALSE}
+# Install devtools if not installed
+if(!require(devtools)){
+  install.packages("devtools")
+}
+# Install misha if not installed
+if(!require(misha)){
+  install.packages('misha', repos=c(getOption('repos'),       'https://tanaylab.github.io/repo'))
+}
+```
 Download and install _umi4cPackage_: 
 ```{r, eval=FALSE}
 devtools::install_github("tanaylab/umi4cpackage", vignette = TRUE)
