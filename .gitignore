@@ -1,2 +1,7 @@
 doc
 Meta
+
+# Created by rstudio:
+.Rproj.user
+umi4cpackage.Rproj
+.Rbuildignore
