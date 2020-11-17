@@ -6,14 +6,37 @@
 \alias{plotCompProf}
 \title{Plot 4C nearcis profile.}
 \usage{
-\method{plot}{p4cProfile}(p4c_obj1, p4c_obj2, trend_scale = "adaptive",
-  png_fn = NULL, ...)
+\method{plot}{p4cProfile}(p4c_obj1, p4c_obj2, trend_scale = "adaptive", png_fn = NULL, ...)
 
-plotSingleProf(p4c_obj, trend_scale, png_fn, plot.colorbar, add.func, xlim,
-  ylim, trend_only, main, sd, ...)
+plotSingleProf(
+  p4c_obj,
+  trend_scale,
+  png_fn,
+  plot.colorbar,
+  add.func,
+  xlim,
+  ylim,
+  trend_only,
+  main,
+  sd,
+  ...
+)
 
-plotCompProf(p4c_obj1, ref_p4c_obj, trend_scale, png_fn, col, min_win_cov,
-  xlim, zlim, legend.text, ylim, dgram.method, main, sd)
+plotCompProf(
+  p4c_obj1,
+  ref_p4c_obj,
+  trend_scale,
+  png_fn,
+  col,
+  min_win_cov,
+  xlim,
+  zlim,
+  legend.text,
+  ylim,
+  dgram.method,
+  main,
+  sd
+)
 }
 \arguments{
 \item{p4c_obj1}{p4cProfile object created by \code{p4cNewProfile}.}
@@ -30,11 +53,13 @@ current graphic device.}
 \item{plot.colorbar}{Optional. Logical that defines whether a colorbar for the domainogram 
 should be plotted.}
 
-\item{xlim}{Similar to R basic grphics. A two elements vector that controls the genomic 
+\item{xlim}{Similar to R basic graphics. A two elements vector that controls the genomic 
 focus of the plot (X axis).}
 
 \item{ylim}{Similar to R basic graphics. A two elements vector that controls the trendline
 ylim (In units of molecules).}
+
+\item{trend_only}{Optional. Logical that defines whether only the trend plot should be displayed.}
 
 \item{main}{Plot title.}
 
@@ -48,6 +73,10 @@ in that genomic window.}
 
 \item{legend.text}{Character vector with length 2. Controls the text in the color legend of the trendline.
 The default are the names of the profiles.}
+
+\item{filename1}{Optional. File for the bedgraph with the trendline of `p4c_obj1`}
+
+\item{filename2}{Optional. File for the bedgraph with the trendline of `p4c_obj2`}
 }
 \description{
 Plot a nearcis profile in the defined genomic scope. Can be applied on a single 

@@ -4,8 +4,15 @@
 \alias{p4cIntervalsMean}
 \title{Compare contacts intensities between two profiles}
 \usage{
-p4cIntervalsMean(p4c_obj, ref_p4c_obj, start, end, min_win_cov = 30,
-  rawdata = FALSE, max_scope = 1e+06)
+p4cIntervalsMean(
+  p4c_obj,
+  ref_p4c_obj,
+  start,
+  end,
+  min_win_cov = 30,
+  rawdata = FALSE,
+  max_scope = 1e+06
+)
 }
 \arguments{
 \item{p4c_obj}{A \code{p4cProfile} object.}

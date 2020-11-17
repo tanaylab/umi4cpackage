@@ -124,7 +124,7 @@ gdb.init("my_genome/trackdb")
 ```
 
 ### Put mappability track
-We will now create a track with the mappability.
+We will now create a track with the mappability. It can be very long if you have a big genome...
 
 - If you did not compute any mappability bedgraph:
 ```{r, eval=FALSE}
@@ -184,7 +184,7 @@ __Make sure that all newlines are linux compatible (\\n) and not windows (\\r\\n
 Now you need to create a database specific to the restriction enzyme you used.
 ```{r, eval=FALSE, warning=FALSE}
 # For example, DpnII:
-gtrack.create_redb_tracks = function(re_seq="GATC", redb_params_fn="my_genome/conf/redb.conf")
+gtrack.create_redb_tracks(re_seq="GATC", redb_params_fn="my_genome/conf/redb.conf")
 ```
 
 After this, you should have two directories that contains all files necessary to do the umi4c analysis:  

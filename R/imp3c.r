@@ -298,7 +298,14 @@ p4cCreate4CseqTrack = function(sample_ids = NULL, track_desc = "4C track",  verb
     }
 }
 
-
+#' Create a new redb for UMI-4C
+#' 
+#' Generate a new database for a restriction enzyme in the redb.conf file.
+#' 
+#' @param re_seq sequence recognition (e.g. 'GATC' for DpnII)
+#' @param redb_params_fn File with the redb parameters ('redb.conf')
+#' 
+#' @export 
 gtrack.create_redb_tracks = function(re_seq, redb_params_fn, verbose = TRUE)
 {
     options(gparam.type = "string")
