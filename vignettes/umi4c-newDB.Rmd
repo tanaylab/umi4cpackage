@@ -39,7 +39,7 @@ if(!require(devtools)){
 }
 # Install misha if not installed
 if(!require(misha)){
-  install.packages('misha', repos=c(getOption('repos'),       'https://tanaylab.github.io/repo'))
+  install.packages('misha', repos=c(getOption('repos'), 'https://tanaylab.github.io/repo'))
 }
 # Install umi4cPackage if not installed
 if(!require(umi4cPackage)){
@@ -129,7 +129,7 @@ We will now create a track with the mappability. It can be very long if you have
 - If you did not compute any mappability bedgraph:
 ```{r, eval=FALSE}
 gtrack.create(track="my_mappab", description="mappab set to 5",
-              expr="5", iterator = 10,
+              expr="5", iterator = min(ALLGENOME[[1]]$end),
               band = NULL)
 ```
 
@@ -152,13 +152,14 @@ gtrack.create(track="my_mappab", description="mappab from gem scaled to 5",
 
 #### Build the chromosome_key table
 
-To create a redb you need to provide a tabulation-delimited file which provide the list of chromosomes and the path to the sequence.
+To create a redb you need to provide a tabulation-delimited file which provide the list of chromosomes and the path to the sequence in fasta format.
 ```{r, eval=FALSE}
-seq.files <- list.files(file.path(GROOT, "seq"))
-seq.names <- sapply(seq.files, function(fn){gsub("^chr", "", 
-                                                 gsub("\\.seq$", "", fn))})
+# You need to adapt here where your individual fasta are:
+fasta.files <- list.files(file.path(genome))
+seq.names <- sapply(fasta.files, function(fn){gsub("^chr", "", 
+                                                 gsub("\\.fa$", "", fn))})
 seq.key.df <- data.frame(names = seq.names,
-                         files = file.path(GROOT, "seq", seq.files))
+                         files = file.path(genome, fasta.files))
 write.table(seq.key.df, "chrom_key.txt", sep ="\t",
             row.names = F, col.names = F, quote = F)
 ```
