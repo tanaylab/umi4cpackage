@@ -341,6 +341,8 @@ gtrack.create_redb_tracks = function(re_seq, redb_params_fn, verbose = TRUE)
     {
         stop("ERROR: missing configuration options\n")
     }
+    # Update the database
+    gdb.reload()
     # create the frags tables
     if (verbose){
         message("constructing table from genomic sequence\n")
