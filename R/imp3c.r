@@ -402,7 +402,7 @@ gtrack.create_redb_tracks = function(re_seq, redb_params_fn, verbose = TRUE)
     # Then 2-3 is both the start and the end
     # of the first fragment. This induce duplicated lines in feFILES.
     nb.duplicates <- system(paste("cat", fe_flen_file,
-                                  "| uniq -d | wc -l > nb.duplicates"),
+                                  "| uniq -d | wc -l"),
                             intern = TRUE)
     if (nb.duplicates > 0){
         # If there are duplicates new files will be created ended by
