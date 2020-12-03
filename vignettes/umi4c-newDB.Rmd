@@ -17,7 +17,8 @@ UMI-4C Package is a processing and analysis pipeline for UMI-4C experiments. Som
 ## Background
 To create a new genomic database, you will need:
 
-- __A fasta file (one per chromosome) where file begins with 'chr' and each chromosome name also begins with 'chr'.__
+- __Fasta files (one per chromosome) where file name begins with 'chr' and each chromosome name also begins with 'chr'.__
+If you have only one file with all chromosomes the steps below will help you to convert it.
 - __Optionnally a mappability bedgraph where values goes from 0 to 5.__
 A section is dedicated to ways to get this mappability bedgraph
 
@@ -49,12 +50,22 @@ if(!require(umi4cPackage)){
 
 ### Fasta files
 Most of genomes are available on UCSC where you can download them through the [download page](http://hgdownload.cse.ucsc.edu/downloads.html) in the section __Genome sequence files and select annotations__. You can also download them by the link:
+
 ```{bash, eval=FALSE}
 genome=mm10
 wget http://hgdownload.cse.ucsc.edu/goldenPath/${genome}/bigZips/${genome}.fa.gz
 ```
 
-To create a new database, you need one file per chromosome. To split your file, you can use awk:
+If you have a fasta file from another source it is also find.
+
+If the name of the chromosome does not begin by 'chr' you will need to add it by:
+
+```{bash, eval=FALSE}
+zcat original.fa.gz | awk '$0~/^>/{gsub(">",">chr", $0)}{print}' | gzip > ${genome}.fa.gz
+```
+
+To create a new database, you need one file per chromosome. If you have only one file, you can split your file using awk:
+
 ```{bash, eval=FALSE}
 genome=mm10
 mkdir -p $genome
