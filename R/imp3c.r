@@ -315,15 +315,17 @@ gtrack.create_redb_tracks = function(re_seq, redb_params_fn, verbose = TRUE)
     options(op.new)
     
     # Get the path of the perl scripts
-    gen_re_frags_pl <- grep("build_re_db.pl", list.files(.libPaths(),
-                                                         recursive = T,
-                                                         full.names = T),
-                            value = T)
+    gen_re_frags_pl <- grep("build_re_db.pl",
+                            list.files(system.file("perl",
+                                                   package = "umi4cPackage"),
+                                       recursive=T, full.names=T),
+                            value=T)
+    
     re_frags_to_fends_pl <- grep("re_frags_to_fends_tab.pl",
-                                 list.files(.libPaths(),
-                                            recursive = T,
-                                            full.names = T),
-                                 value = T)
+                                 list.files(system.file("perl",
+                                                        package = "umi4cPackage"),
+                                            recursive=T, full.names=T),
+                                 value=T)
     
     mapab_track = getOption("TG3C.mapab_track", NA)
     re_workdir = getOption("TG3C.re_workdir", NA)
