@@ -4,8 +4,13 @@
 \alias{p4cCreate4CseqTrack}
 \title{Import fastq files to a genomic track.}
 \usage{
-p4cCreate4CseqTrack(sample_ids = NULL, track_desc = "4C track",
-  verbose = TRUE, overwrite.if.exist = FALSE, groot = NULL)
+p4cCreate4CseqTrack(
+  sample_ids = NULL,
+  track_desc = "4C track",
+  verbose = TRUE,
+  overwrite.if.exist = FALSE,
+  groot = NULL
+)
 }
 \arguments{
 \item{sample_ids}{Numerical samples IDs from the baits.txt table.}

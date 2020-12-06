@@ -11,11 +11,17 @@ p4cExportBedGraph(p4c_obj, filename, min_win_cov = 50, color = "black")
 
 \item{filename}{Filename of the bedGraph.}
 
-\item{min_win_cov}{Smoothing parameter.}
+\item{min_win_cov}{If the default smoothing method is used ('adaptive'), this parameter
+controls the window size by requiring that no less than \code{min_win_cov} molecules will be included
+in that genomic window.}
 
 \item{color}{Color of the bedGraph plot.}
+
+\item{trend_scale}{This parameter controls the smoothing method for the trendline. Either 
+'adaptive' (default), or, for fixed window trend, an integer with the desired size 
+of the window (in restriction fragments units), put 0 for the raw molecule number.}
 }
 \description{
-\code{p4cExportBedGraph} exports the smoothed trend to a file which can be imported as a 'custom track'
-to the UCSC genome browser.
+\code{p4cExportBedGraph} exports the smoothed trend with an adaptative or a fixed smoothing window
+to a file which can be imported as a 'custom track' to the UCSC genome browser.
 }
