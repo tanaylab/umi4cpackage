@@ -218,7 +218,8 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NULL, trend_scale = "ada
         p4c_obj <- .p4cGenerateBaitDgram(p4c_obj)
     }
     
-    dgram <- p4c_obj$dgram  #access dgram table
+    dgram <- p4c_obj$dgram  # access dgram table
+    cur_name <- p4c_obj$track_nm # Get the name
     coords <- dgram[, 1]
     n <- length(dgram[, 1])
     
