@@ -763,7 +763,7 @@ p4cIntervalsMean <- function(p4c_obj, ref_p4c_obj, start, end, min_win_cov = 30,
 #' @param color Color of the bedGraph plot.
 #' 
 #' @export
-p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "black")
+p4cExportBedGraph <- function(p4c_obj, filename, trend_scale = "adaptive", min_win_cov = 50, color = "black")
 {
     # Check that the parameters are valid
     if (trend_scale != "adaptive" & !is.numeric(trend_scale))
