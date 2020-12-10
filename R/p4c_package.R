@@ -265,12 +265,10 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NULL, trend_scale = "ada
     coords <- na.omit(coords)
 
     if(!missing(filename1)){
-        cur_name <- p4c_obj$track_nm
-        cur_col <- paste((col2rgb(col)), collapse = ",")
         header_line1 <- sprintf("browser position %s:%i-%i", paste0("chr", gsub("chr", 
             "", p4c_obj$bait$chrom)), coords[1], tail(coords, 1))
-        header_line2 <- sprintf("track type=bedGraph name=\"%s\" description=\"%s\" color=%s", 
-            track_name, cur_desc, cur_col)
+        header_line2 <- sprintf("track type=bedGraph name=\"%s\" description=\"%s\"", 
+            track_name, cur_desc)
         write(header_line1, filename1)
         write(header_line2, filename1, append = T)
     
