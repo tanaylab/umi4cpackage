@@ -432,7 +432,7 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NULL, trend_scale = "ada
 #' @rdname plot.p4cProfile
 #' @export
 plotCompProf <- function(p4c_obj1, ref_p4c_obj, trend_scale, png_fn, col, min_win_cov, 
-    xlim, zlim, legend.text, ylim, dgram.method, main, sd) UseMethod("plotCompProf")
+    xlim, zlim, legend.text, ylim, dgram.method, main, sd, filename1, filename2, trend_only) UseMethod("plotCompProf")
 
 #' @export
 plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adaptive",
