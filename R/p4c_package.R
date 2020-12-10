@@ -800,7 +800,7 @@ p4cExportBedGraph <- function(p4c_obj, filename, trend_scale = "adaptive", min_w
         {
             trend_scale_idx <- which(p4c_obj$dgram_params$dgram_scales == trend_scale) + 2
             # Update the coordinates to use geomean coordinates
-            coords <- p4cWinGeoMeanCoordinate(coords, trend_scale * 2, bait_x)
+            coords <- .p4cWinGeoMeanCoordinate(coords, trend_scale * 2, bait_x)
             n <- length(dgram[, 1])
             # Restrict to inside values to remove NAs
             coords <- coords[trend_scale:(n - trend_scale)]
