@@ -218,7 +218,8 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NULL, trend_scale = "ada
         p4c_obj <- .p4cGenerateBaitDgram(p4c_obj)
     }
     
-    dgram <- p4c_obj$dgram  #access dgram table
+    dgram <- p4c_obj$dgram  # access dgram table
+    cur_name <- p4c_obj$track_nm # Get the name
     coords <- dgram[, 1]
     n <- length(dgram[, 1])
     
@@ -264,12 +265,10 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NULL, trend_scale = "ada
     coords <- na.omit(coords)
 
     if(!missing(filename1)){
-        cur_name <- p4c_obj$track_nm
-        cur_col <- paste((col2rgb(col)), collapse = ",")
         header_line1 <- sprintf("browser position %s:%i-%i", paste0("chr", gsub("chr", 
-            "", p4c_obj$bait$chrom)), coords[1], tail(coords, 1))
-        header_line2 <- sprintf("track type=bedGraph name=\"%s\" description=\"%s\" color=%s", 
-            track_name, cur_desc, cur_col)
+            "", p4c_obj$bait$chrom)), round(coords[1]), round(tail(coords, 1)))
+        header_line2 <- sprintf("track type=bedGraph name=\"%s\" description=\"%s\"", 
+            track_name, cur_desc)
         write(header_line1, filename1)
         write(header_line2, filename1, append = T)
     
@@ -433,7 +432,7 @@ plotSingleProf.p4cProfile <- function(p4c_obj, png_fn = NULL, trend_scale = "ada
 #' @rdname plot.p4cProfile
 #' @export
 plotCompProf <- function(p4c_obj1, ref_p4c_obj, trend_scale, png_fn, col, min_win_cov, 
-    xlim, zlim, legend.text, ylim, dgram.method, main, sd) UseMethod("plotCompProf")
+    xlim, zlim, legend.text, ylim, dgram.method, main, sd, filename1, filename2, trend_only) UseMethod("plotCompProf")
 
 #' @export
 plotCompProf.p4cProfile <- function(p4c_obj1, ref_p4c_obj, trend_scale = "adaptive",
@@ -762,7 +761,7 @@ p4cIntervalsMean <- function(p4c_obj, ref_p4c_obj, start, end, min_win_cov = 30,
 #' @param color Color of the bedGraph plot.
 #' 
 #' @export
-p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "black")
+p4cExportBedGraph <- function(p4c_obj, filename, trend_scale = "adaptive", min_win_cov = 50, color = "black")
 {
     # Check that the parameters are valid
     if (trend_scale != "adaptive" & !is.numeric(trend_scale))
@@ -799,7 +798,7 @@ p4cExportBedGraph <- function(p4c_obj, filename, min_win_cov = 50, color = "blac
         {
             trend_scale_idx <- which(p4c_obj$dgram_params$dgram_scales == trend_scale) + 2
             # Update the coordinates to use geomean coordinates
-            coords <- p4cWinGeoMeanCoordinate(coords, trend_scale * 2, bait_x)
+            coords <- .p4cWinGeoMeanCoordinate(coords, trend_scale * 2, bait_x)
             n <- length(dgram[, 1])
             # Restrict to inside values to remove NAs
             coords <- coords[trend_scale:(n - trend_scale)]
