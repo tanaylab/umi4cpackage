@@ -39,14 +39,14 @@ p4cNewProfile <- function(track_nm, bait_chrom = gtrack.attr.get(track_nm[1], "B
     
     # Check that the scopes are compatible with bait and chromosome size
     if (bait_start < scope_5){
-        warning("The bait coordinate is", bait_start, "but the scope_5 was set to", scope_5,
+        warning("The bait coordinate is ", bait_start, " but the scope_5 was set to ", scope_5,
                 ".\nThis would give negative coordinate. scope_5 is adjusted.")
         scope_5 <- bait_start
     }
-    chrom_size <- gintervals.all()[gintervals.all()$chrom == bait_chrom, ]$end
+    chrom_size <- gintervals.all()[gintervals.all()$chrom == paste0("chr", bait_chrom), ]$end
     if (bait_start + scope_3 > chrom_size){
-        warning("The bait coordinate is", bait_start, "and the chromosome size is",
-                chrom_size, "but the scope_3 was set to", scope_3,
+        warning("The bait coordinate is ", bait_start, " and the chromosome size is ",
+                chrom_size, " but the scope_3 was set to ", scope_3,
                 ".\nThis would give coordinate above chromsome size. scope_3 is adjusted.")
         scope_3 <- chrom_size - bait_start
     }    
