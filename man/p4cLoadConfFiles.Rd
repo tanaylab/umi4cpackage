@@ -4,9 +4,12 @@
 \alias{p4cLoadConfFiles}
 \title{Load all the config files required for the package.}
 \usage{
-p4cLoadConfFiles(conf_dir, paths_conf = file.path(conf_dir,
-  "paths.conf"), pipeline_conf = file.path(conf_dir, "pipeline.conf"),
-  p4c_conf = file.path(conf_dir, "p4c.conf"))
+p4cLoadConfFiles(
+  conf_dir,
+  paths_conf = file.path(conf_dir, "paths.conf"),
+  pipeline_conf = file.path(conf_dir, "pipeline.conf"),
+  p4c_conf = file.path(conf_dir, "p4c.conf")
+)
 }
 \arguments{
 \item{conf_dir}{A directory with all the defined conf files. Should have the same

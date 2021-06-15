@@ -4,8 +4,12 @@
 \alias{p4cBuildRequirements}
 \title{Build the required genomic datasets.}
 \usage{
-p4cBuildRequirements(output_dir, genome = "hg19", reseq = "GATC",
-  dataset_keys = "http://www.wisdom.weizmann.ac.il/~omersch/dataset_keys.txt")
+p4cBuildRequirements(
+  output_dir,
+  genome = "hg19",
+  reseq = "GATC",
+  dataset_keys = "http://www.wisdom.weizmann.ac.il/~omersch/dataset_keys.txt"
+)
 }
 \arguments{
 \item{output_dir}{Output directory for the dataset.}
