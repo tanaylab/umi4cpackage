@@ -43,7 +43,7 @@ p4cNewProfile <- function(track_nm, bait_chrom = gtrack.attr.get(track_nm[1], "B
                 ".\nThis would give negative coordinate. scope_5 is adjusted.")
         scope_5 <- bait_start
     }
-    chrom_size <- gintervals.all()[gintervals.all()$chrom == paste0("chr", bait_chrom), ]$end
+    chrom_size <- gintervals.all()[gintervals.all()$chrom == paste0("chr", gsub("chr", "", bait_chrom)), ]$end
     if (bait_start + scope_3 > chrom_size){
         warning("The bait coordinate is ", bait_start, " and the chromosome size is ",
                 chrom_size, " but the scope_3 was set to ", scope_3,
