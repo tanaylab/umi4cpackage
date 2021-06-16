@@ -44,7 +44,7 @@ if(!require(misha)){
 }
 # Install umi4cPackage if not installed
 if(!require(umi4cPackage)){
-  devtools::install_github("tanaylab/umi4cpackage", vignette = TRUE)
+  devtools::install_github("tanaylab/umi4cpackage", build_vignette = TRUE)
 }
 ```
 
