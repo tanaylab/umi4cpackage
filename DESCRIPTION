@@ -1,6 +1,6 @@
 Package: umi4cPackage
 Title: Processing & Analysis of UMI-4C Contact Profiles.
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R: c(person("Amos", "Tanay", role=c("aut")), 
     person("Omer", "Schwartzman", email="omer.schwartzman@gmail.com", role=c("aut", "cre")))
 Description: Process UMI-4C data from scratch to produce nice plots.
