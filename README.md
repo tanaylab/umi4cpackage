@@ -21,7 +21,7 @@ The pipeline is designed to run on a standard linux machine. The basic requireme
 #### Installation
 
 ```r
-devtools::install_github("tanaylab/umi4cpackage", vignette = TRUE)
+remotes::install_github("tanaylab/umi4cpackage", build_vignette = TRUE)
 library(umi4cPackage)
 ```
 
