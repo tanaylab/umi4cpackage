@@ -1,8 +1,0 @@
-pandoc: 1.19.2.1
-pkgdown: 1.6.1
-pkgdown_sha: ~
-articles:
-  umi4c-newDB: umi4c-newDB.html
-  umi4c-usage: umi4c-usage.html
-last_built: 2021-06-16T08:39Z
-
