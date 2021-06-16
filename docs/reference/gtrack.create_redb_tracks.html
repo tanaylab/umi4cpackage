@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • umi4cPackage</title>
+<title>Create a new redb for UMI-4C — gtrack.create_redb_tracks • umi4cPackage</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,8 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Create a new redb for UMI-4C — gtrack.create_redb_tracks" />
+<meta property="og:description" content="Generate a new database for a restriction enzyme in the redb.conf file." />
 
 
 
@@ -58,7 +59,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
@@ -108,108 +109,34 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Create a new redb for UMI-4C</h1>
+    
+    <div class="hidden name"><code>gtrack.create_redb_tracks.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p>Generate a new database for a restriction enzyme in the redb.conf file.</p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='fu'>gtrack.create_redb_tracks</span><span class='op'>(</span><span class='va'>re_seq</span>, <span class='va'>redb_params_fn</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="get_param.html">get_param()</a></code> </p>
-        </td>
-        <td><p>Get params from saved var</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_param_list.html">get_param_list()</a></code> </p>
-        </td>
-        <td><p>Get params from saved var</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="gtrack.create_redb_tracks.html">gtrack.create_redb_tracks()</a></code> </p>
-        </td>
-        <td><p>Create a new redb for UMI-4C</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="init_params.html">init_params()</a></code> </p>
-        </td>
-        <td><p>Read params from files</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="p4cBuildRequirements.html">p4cBuildRequirements()</a></code> </p>
-        </td>
-        <td><p>Build the required genomic datasets.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="p4cCreate4CseqTrack.html">p4cCreate4CseqTrack()</a></code> </p>
-        </td>
-        <td><p>Import fastq files to a genomic track.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="p4cDumpConfFiles.html">p4cDumpConfFiles()</a></code> </p>
-        </td>
-        <td><p>Dump config files templates.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="p4cExportBedGraph.html">p4cExportBedGraph()</a></code> </p>
-        </td>
-        <td><p>Export bedGraph</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="p4cIntervalsMean.html">p4cIntervalsMean()</a></code> </p>
-        </td>
-        <td><p>Compare contacts intensities between two profiles</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="p4cLoadConfFiles.html">p4cLoadConfFiles()</a></code> </p>
-        </td>
-        <td><p>Load all the config files required for the package.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="p4cNewProfile.html">p4cNewProfile()</a></code> </p>
-        </td>
-        <td><p>Create a new p4cProfile object.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="plot.p4cProfile.html">plot(<i>&lt;p4cProfile&gt;</i>)</a></code> <code><a href="plot.p4cProfile.html">plotSingleProf()</a></code> <code><a href="plot.p4cProfile.html">plotCompProf()</a></code> </p>
-        </td>
-        <td><p>Plot 4C nearcis profile.</p></td>
-      </tr>
-    </tbody>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>re_seq</th>
+      <td><p>sequence recognition (e.g. 'GATC' for DpnII)</p></td>
+    </tr>
+    <tr>
+      <th>redb_params_fn</th>
+      <td><p>File with the redb parameters ('redb.conf')</p></td>
+    </tr>
     </table>
-  </div>
 
+
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
