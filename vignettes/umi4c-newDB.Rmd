@@ -7,7 +7,7 @@ author:
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{NewDBForumi4cPackage}
+  %\VignetteIndexEntry{Create a new database for umi4cPackage}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
