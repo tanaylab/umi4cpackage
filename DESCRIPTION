@@ -8,7 +8,7 @@ Depends:
     R (>= 3.0),
     misha,
     zoo
-License: 
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
