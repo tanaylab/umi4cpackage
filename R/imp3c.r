@@ -283,17 +283,22 @@ p4cCreate4CseqTrack = function(sample_ids = NULL, track_desc = "4C track",  verb
             bait_name <- baits_tab$Bait_name[bait_row_idx]
             contacts_fn <- sprintf("%s/%s.%s/adj.%s", work_dir, exp_nm, sample_nm, 
                                    bait_name)
-            foc_ndx_track_name_bait <- paste0(foc_ndx_track_name, "_", bait_name)
-            message("Will import ", foc_ndx_track_name_bait, " from ", contacts_fn, 
-                    " fends at ", fends_fn)
-            gtrack.2d.import_contacts(foc_ndx_track_name_bait, description = track_desc, 
-                                      contacts = contacts_fn, fends = fends_fn)
-            bait_chr <- baits_tab$Bait_chr[bait_row_idx]
-            bait_coord <- baits_tab$Bait_coord[bait_row_idx]
-            gtrack.attr.set(foc_ndx_track_name_bait, attr = "Bait_name", value = bait_name)
-            gtrack.attr.set(foc_ndx_track_name_bait, attr = "Bait_chr", value = bait_chr)
-            gtrack.attr.set(foc_ndx_track_name_bait, attr = "Bait_coord", value = bait_coord)
-            message(foc_ndx_track_name_bait, " was imported succsesfully! ")
+            if (file.exists(contacts_fn)) {
+                foc_ndx_track_name_bait <- paste0(foc_ndx_track_name, "_", bait_name)
+                message("Will import ", foc_ndx_track_name_bait, " from ", contacts_fn, 
+                        " fends at ", fends_fn)
+                gtrack.2d.import_contacts(foc_ndx_track_name_bait, description = track_desc, 
+                                          contacts = contacts_fn, fends = fends_fn)
+                bait_chr <- baits_tab$Bait_chr[bait_row_idx]
+                bait_coord <- baits_tab$Bait_coord[bait_row_idx]
+                gtrack.attr.set(foc_ndx_track_name_bait, attr = "Bait_name", value = bait_name)
+                gtrack.attr.set(foc_ndx_track_name_bait, attr = "Bait_chr", value = bait_chr)
+                gtrack.attr.set(foc_ndx_track_name_bait, attr = "Bait_coord", value = bait_coord)
+                message(foc_ndx_track_name_bait, " was imported succsesfully! ")
+            } else {
+                message("Will not import ", foc_ndx_track_name_bait, " as ", contacts_fn, 
+                        " does not exists")
+            }
         }
     }
 }
