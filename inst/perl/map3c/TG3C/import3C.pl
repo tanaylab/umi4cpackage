@@ -266,7 +266,7 @@ if ( $opt->get_opt( "TG3C.split_tracks_by_baits", "TRUE" ) == "TRUE" ) {
       . "-sample_id $sample_id "
       . "-redb_dir $dir_redb "
       . "-re_seq $re "
-      . "-log_file $wd/logs/bait_umis.log"
+      . "-log_file $wd/logs/bait_umis.log "
       . "-around_fends $around_fends";
     my $ret = system($cmd);
     if ($ret) { warn "Couldn't split adj by baits\n"; }
