@@ -12,10 +12,10 @@ require map3c::TG3C::BaitsTab4C;
 require map3c::TG3C::SamplesTab4C;
 
 if (scalar @ARGV < 4) {
-    die "usage $0 --adj <adj> --samples_tab <tab> --baits_tab <tab> --sample_id <samples_id> --redb_dir <> --re_seq <> --log_file <>\n";
+    die "usage $0 --adj <adj> --samples_tab <tab> --baits_tab <tab> --sample_id <samples_id> --redb_dir <> --re_seq <> --log_file <> --around_fends <>\n";
 }
 
-my ($conf_file, $adj_fn, $sample_id, $redb_dir, $re_seq, $bait_tab_fn, $samp_tab_fn);
+my ($conf_file, $adj_fn, $sample_id, $redb_dir, $re_seq, $bait_tab_fn, $samp_tab_fn, $around_fends);
 my $log_file = undef;
 GetOptions(
            "baits_tab=s" => \$bait_tab_fn,
@@ -24,7 +24,8 @@ GetOptions(
            "sample_id=i" => \$sample_id,
            "redb_dir=s"  => \$redb_dir,
            "log_file=s"  => \$log_file,
-           "re_seq=s"    => \$re_seq
+           "re_seq=s"    => \$re_seq,
+           "around_fends=i" => \$around_fends
            )
 	or die "not all args supplied\n";
 
@@ -89,7 +90,7 @@ sub print_to_bait_fh {
     my $matched = 0;
 
     #step one fend1 before and after to map
-    for (my $cur_f = $fend1-3; $cur_f <= $fend1+3; $cur_f++) {
+    for (my $cur_f = $fend1-$around_fends; $cur_f <= $fend1+$around_fends; $cur_f++) {
 
         if (exists $bait_fends->{$cur_f}) {
             $cur_bait_name = $bait_fends->{$cur_f};

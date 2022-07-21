@@ -253,8 +253,9 @@ if ( $opt->get_opt( "TG3C.do_adj_coord", 0 ) ) {
 ############################
 if ( $opt->get_opt( "TG3C.split_tracks_by_baits", "TRUE" ) == "TRUE" ) {
     print STDERR "3CPipe: will split tracks to baits\n";
-    my ($dir_redb) = $opt->get_opt("TG3C.redb");
-    my ($re)       = $opt->get_opt("TG3C.RE_seq");
+    my ($dir_redb)     = $opt->get_opt("TG3C.redb");
+    my ($re)           = $opt->get_opt("TG3C.RE_seq");
+    my ($around_fends) = $opt->get_opt("TG3C.around_fends");
     my @conf_files = grep( /^\@/, @ARGV );
     my $conf_file = substr( $conf_files[0], 1 );
     my $cmd =
@@ -265,7 +266,8 @@ if ( $opt->get_opt( "TG3C.split_tracks_by_baits", "TRUE" ) == "TRUE" ) {
       . "-sample_id $sample_id "
       . "-redb_dir $dir_redb "
       . "-re_seq $re "
-      . "-log_file $wd/logs/bait_umis.log";
+      . "-log_file $wd/logs/bait_umis.log"
+      . "-around_fends $around_fends";
     my $ret = system($cmd);
     if ($ret) { warn "Couldn't split adj by baits\n"; }
 }
