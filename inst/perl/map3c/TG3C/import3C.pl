@@ -255,7 +255,7 @@ if ( $opt->get_opt( "TG3C.split_tracks_by_baits", "TRUE" ) == "TRUE" ) {
     print STDERR "3CPipe: will split tracks to baits\n";
     my ($dir_redb)     = $opt->get_opt("TG3C.redb");
     my ($re)           = $opt->get_opt("TG3C.RE_seq");
-    my ($around_fends) = $opt->get_opt("TG3C.around_fends");
+    my ($around_fends) = $opt->get_opt("TG3C.around_fends", 3);
     my @conf_files = grep( /^\@/, @ARGV );
     my $conf_file = substr( $conf_files[0], 1 );
     my $cmd =
