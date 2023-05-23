@@ -100,7 +100,16 @@ __Make sure that all newlines are linux compatible (\\n) and not windows (\\r\\n
     - __Bait\_pad__: Padding sequence - the sequence between the bait primer end to the bait fragment restriction site (including the restriction sequence, e.g., for DpnII: XXXXGATC).
     - __Bait\_chr__: Bait chromosome.
     - __Bait\_coord__: Bait coord. Ideally the coordinate of the nearest restriction site to the bait.
-- __pipeline.conf__: Pipeline settings. The defaults should work fine for __DpnII__.  
+- __pipeline.conf__: Pipeline settings. The defaults should work fine for __DpnII__.  Here are the different parameters:
+    - __TG3C.RE_seq__: Recognition Sequence of the enzyme used.
+    - __TG3C.segment_min_len__: When splitting fastqs only segments above this length are written to the splitted fastq.
+    - __TG3C.min_avg_read_qual__: Once trimmed for bad quality bases, if the read average quality is below this number, the read is not splitted and not written to the splitted fastq (default is 20).
+    - __TG3C.min_base_qual__: Threshold used to decide how many bases will be trimmed. The bases are trimmed when less than 80% of reads have quality above this threshold (default is 30).
+    - __TG3C.bowtie2_threads__: Number of threads launched by bowtie2 (default is 2).
+    - __TG3C.min_map_qual__: Consider only mapped reads above this mapping quality (except the bait which has no threshold, default is 30).
+    - __TG3C.switch_ratio__: When counting UMIs, ignore the UMIs which have less reads than switch_ratio times the highest number of reads for a molecule for the same viewpoint.
+    - __TG3C.filter_near_sonic__: Tolerence on the sonication point (5' of read 2) to be considered as identical (PCR duplicates).
+    - __TG3C.around_fends__: How far (in number of fragment end) from the fragment end of the bait coordinate as specified in the __baits.txt__ the UMIs are attributed to the bait (default is 3).
 - __p4c.conf__: Analysis settings. The defaults should work fine.  
 
 ---
