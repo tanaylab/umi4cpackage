@@ -96,7 +96,7 @@ p4cLoadConfFiles <- function(conf_dir,
     options(op.p4c)
     
     .checkConf()
-    gset_input_mode(autocompletion = FALSE, interactive = FALSE)
+    
     gsetroot(getOption("TG3C.trackdb"), rescan = TRUE)
     
     invisible()
@@ -387,7 +387,7 @@ gtrack.create_redb_tracks = function(re_seq, redb_params_fn, verbose = TRUE)
     if (verbose){
         message("writing mapability text file to re workdir")
     }
-    gextract(fragmap_track, ALLGENOME, iterator = fragmap_track, file = fragmap_file)
+    gextract(fragmap_track, .misha$ALLGENOME, iterator = fragmap_track, file = fragmap_file)
     # separate frags to fends table
     message("writing fend tables from frag tables")
     cmd = sprintf("perl %s %s %s", re_frags_to_fends_pl, re_workdir, re_seq)
