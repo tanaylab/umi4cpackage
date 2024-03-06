@@ -17,8 +17,8 @@ p4cExportBedGraph(
 
 \item{filename}{Filename of the bedGraph.}
 
-\item{trend_scale}{This parameter controls the smoothing method for the trendline. Either 
-'adaptive' (default), or, for fixed window trend, an integer with the desired size 
+\item{trend_scale}{This parameter controls the smoothing method for the trendline. Either
+'adaptive' (default), or, for fixed window trend, an integer with the desired size
 of the window (in restriction fragments units), put 0 for the raw molecule number.}
 
 \item{min_win_cov}{If the default smoothing method is used ('adaptive'), this parameter

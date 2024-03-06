@@ -14,7 +14,7 @@ LazyData: true
 Imports:
     misha (>= 4.2.2)
 Remotes: tanaylab/misha
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr

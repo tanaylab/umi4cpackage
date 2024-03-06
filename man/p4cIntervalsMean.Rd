@@ -11,7 +11,7 @@ p4cIntervalsMean(
   end,
   min_win_cov = 30,
   rawdata = FALSE,
-  max_scope = 1e+06
+  max_scope = 1000000
 )
 }
 \arguments{
@@ -29,9 +29,9 @@ p4cIntervalsMean(
 Compare contact intensities at specific genomic intervals.
 }
 \details{
-When a genomic region is suspected to be defferentialy contacting between two profiles, 
+When a genomic region is suspected to be defferentialy contacting between two profiles,
 it is possible to compare these two profiles in the same intervals by deriving the normalized contact values
-in that region. This function facilitates this task. It returns a data.frame with 
+in that region. This function facilitates this task. It returns a data.frame with
 the either the row molecule counts if \code{rowdata = TRUE} or normalized other wise.
 The smoothing is controlled by \code{min_win_cov}.
 

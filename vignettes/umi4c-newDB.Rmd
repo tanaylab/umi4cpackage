@@ -35,16 +35,16 @@ The pipeline is designed to run on a standard linux machine. The basic requireme
 #### Install the R dependencies
 ```{r, eval=FALSE}
 # Install devtools if not installed
-if(!require(devtools)){
-  install.packages("devtools")
+if (!require(devtools)) {
+    install.packages("devtools")
 }
 # Install misha if not installed
-if(!require(misha)){
-  install.packages('misha', repos=c(getOption('repos'), 'https://tanaylab.github.io/repo'))
+if (!require(misha)) {
+    install.packages("misha", repos = c(getOption("repos"), "https://tanaylab.github.io/repo"))
 }
 # Install umi4cPackage if not installed
-if(!require(umi4cPackage)){
-  devtools::install_github("tanaylab/umi4cpackage", build_vignette = TRUE)
+if (!require(umi4cPackage)) {
+    devtools::install_github("tanaylab/umi4cpackage", build_vignette = TRUE)
 }
 ```
 
@@ -139,24 +139,29 @@ We will now create a track with the mappability. It can be very long if you have
 
 - If you did not compute any mappability bedgraph:
 ```{r, eval=FALSE}
-gtrack.create(track="my_mappab", description="mappab set to 5",
-              expr="5", iterator = min(.misha$ALLGENOME[[1]]$end),
-              band = NULL)
+gtrack.create(
+    track = "my_mappab", description = "mappab set to 5",
+    expr = "5", iterator = min(.misha$ALLGENOME[[1]]$end),
+    band = NULL
+)
 ```
 
 - If you computed the mappability with gem or any other way and you have a bedgraph:
 ```{r, eval=FALSE}
 mapab_fn <- paste0(genome, "_50.bg")
 # Create a track from the bedgraph
-gtrack.import(track="mappab_from_file", description="mappability from gem",
-              file=mapab_fn, 10)
+gtrack.import(
+    track = "mappab_from_file", description = "mappability from gem",
+    file = mapab_fn, 10
+)
 # Get the maxiumum value (1 with gem):
 max.value <- gsummary("mappab_from_file")["Max"]
 # Create a new track with the values scaled to get max at 5:
-gtrack.create(track="my_mappab", description="mappab from gem scaled to 5",
-              expr=paste("mappab_from_file * 5 /", max.value), iterator = 10,
-              band = NULL)
-
+gtrack.create(
+    track = "my_mappab", description = "mappab from gem scaled to 5",
+    expr = paste("mappab_from_file * 5 /", max.value), iterator = 10,
+    band = NULL
+)
 ```
 
 ### Create the redb tracks
@@ -167,12 +172,20 @@ To create a redb you need to provide a tabulation-delimited file which provide t
 ```{r, eval=FALSE}
 # You need to adapt here where your individual fasta are:
 fasta.files <- list.files(file.path(genome))
-seq.names <- sapply(fasta.files, function(fn){gsub("^chr", "", 
-                                                 gsub("\\.fa$", "", fn))})
-seq.key.df <- data.frame(names = seq.names,
-                         files = file.path(genome, fasta.files))
-write.table(seq.key.df, "chrom_key.txt", sep ="\t",
-            row.names = F, col.names = F, quote = F)
+seq.names <- sapply(fasta.files, function(fn) {
+    gsub(
+        "^chr", "",
+        gsub("\\.fa$", "", fn)
+    )
+})
+seq.key.df <- data.frame(
+    names = seq.names,
+    files = file.path(genome, fasta.files)
+)
+write.table(seq.key.df, "chrom_key.txt",
+    sep = "\t",
+    row.names = F, col.names = F, quote = F
+)
 ```
 
 
@@ -196,7 +209,7 @@ __Make sure that all newlines are linux compatible (\\n) and not windows (\\r\\n
 Now you need to create a database specific to the restriction enzyme you used.
 ```{r, eval=FALSE, warning=FALSE}
 # For example, DpnII:
-gtrack.create_redb_tracks(re_seq="GATC", redb_params_fn="my_genome/conf/redb.conf")
+gtrack.create_redb_tracks(re_seq = "GATC", redb_params_fn = "my_genome/conf/redb.conf")
 ```
 
 After this, you should have two directories that contains all files necessary to do the umi4c analysis:  
