@@ -140,7 +140,7 @@ We will now create a track with the mappability. It can be very long if you have
 - If you did not compute any mappability bedgraph:
 ```{r, eval=FALSE}
 gtrack.create(track="my_mappab", description="mappab set to 5",
-              expr="5", iterator = min(ALLGENOME[[1]]$end),
+              expr="5", iterator = min(.misha$ALLGENOME[[1]]$end),
               band = NULL)
 ```
 

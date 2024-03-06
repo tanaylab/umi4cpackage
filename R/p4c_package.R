@@ -99,9 +99,9 @@ summary.p4cProfile <- function(p4c_obj)
     bait_lookup_expansion <- p4c_obj$bait$bait_lookup_expansion
     
    
-    d <- nrow(ALLGENOME[[1]])
+    d <- nrow(.misha$ALLGENOME[[1]])
     ivals <- gintervals.2d(rep(bait_chrom, d), rep(bait_start - bait_lookup_expansion, d), rep(bait_start + 
-        bait_lookup_expansion, d), ALLGENOME[[1]]$chrom, ALLGENOME[[1]]$start, ALLGENOME[[1]]$end)
+        bait_lookup_expansion, d), .misha$ALLGENOME[[1]]$chrom, .misha$ALLGENOME[[1]]$start, .misha$ALLGENOME[[1]]$end)
     
     ivals.trans <- ivals[ivals$chrom2 != bait_chrom, ]
     
