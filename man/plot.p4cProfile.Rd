@@ -35,7 +35,10 @@ plotCompProf(
   ylim,
   dgram.method,
   main,
-  sd
+  sd,
+  filename1,
+  filename2,
+  trend_only
 )
 }
 \arguments{
@@ -43,17 +46,17 @@ plotCompProf(
 
 \item{p4c_obj2}{Optional. A second p4cProfile object that will be compared to p4c_obj1.}
 
-\item{trend_scale}{This parameter controls the smoothing method for the trendline. Either 
-'adaptive' (default), or, for fixed window trend, an integer with the desired size 
+\item{trend_scale}{This parameter controls the smoothing method for the trendline. Either
+'adaptive' (default), or, for fixed window trend, an integer with the desired size
 of the window (in restriction fragments units).}
 
-\item{png_fn}{File to save the plot to. The default (NULL) will result in plotting on the 
+\item{png_fn}{File to save the plot to. The default (NULL) will result in plotting on the
 current graphic device.}
 
-\item{plot.colorbar}{Optional. Logical that defines whether a colorbar for the domainogram 
+\item{plot.colorbar}{Optional. Logical that defines whether a colorbar for the domainogram
 should be plotted.}
 
-\item{xlim}{Similar to R basic graphics. A two elements vector that controls the genomic 
+\item{xlim}{Similar to R basic graphics. A two elements vector that controls the genomic
 focus of the plot (X axis).}
 
 \item{ylim}{Similar to R basic graphics. A two elements vector that controls the trendline
@@ -79,14 +82,14 @@ The default are the names of the profiles.}
 \item{filename2}{Optional. File for the bedgraph with the trendline of `p4c_obj2`}
 }
 \description{
-Plot a nearcis profile in the defined genomic scope. Can be applied on a single 
+Plot a nearcis profile in the defined genomic scope. Can be applied on a single
 p4cProfile object or a two object for a comparison plot.
 }
 \details{
 This function calls two methods depending on whether it is called on a single object
 or two objects. When it is called on a single p4cProfile object it will produce a nearcis
-plot with smoothed trendline, and a contact intensity domainogram. 
-Calling this function for two object will produce a comparison plot of where the 
+plot with smoothed trendline, and a contact intensity domainogram.
+Calling this function for two object will produce a comparison plot of where the
 4C profiles are normalized for UMI coverage. The two p4cProfile objects must be
 constructed for the \strong{same bait} with the \strong{same genomic scope}.
 }
@@ -96,7 +99,7 @@ constructed for the \strong{same bait} with the \strong{same genomic scope}.
 fc <- p4cNewProfile("umi4C_example_CMK_ANK1_TSS")
 
 # Plot a profile on:
-plot(fc, xlim=c(41554693, 41754693), ylim=c(0, 5), plot.colorbar=TRUE)
+plot(fc, xlim = c(41554693, 41754693), ylim = c(0, 5), plot.colorbar = TRUE)
 
 
 # Comparing two profiles:
@@ -104,7 +107,7 @@ plot(fc, xlim=c(41554693, 41754693), ylim=c(0, 5), plot.colorbar=TRUE)
 fc_cond2 <- p4cNewProfile("umi4C_example_DND41_ANK1_TSS")
 
 # Plot profiles
-plot(fc, fc_cond2, col=c('red', 'blue'), min_win_cov=100, main = '4C figure', png_fn='fig.png') 
+plot(fc, fc_cond2, col = c("red", "blue"), min_win_cov = 100, main = "4C figure", png_fn = "fig.png")
 }
 
 }

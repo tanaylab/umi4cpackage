@@ -22,11 +22,11 @@ names that will be pooled together by summation.}
 \item{bait_start}{Integer. Start coordinate of the bait.}
 
 \item{scope_5, scope_3}{Define the scope of the profile. How many bases upstream
-and downstream of the bait should be used for generating the profile. 
+and downstream of the bait should be used for generating the profile.
 Default is set to 250kb upstream and downstream.}
 
-\item{stat_type}{Define the method for calculating the profile contact intensities. 
-Either "linear" or "log", for arithmetic or geometric means, respectively. Default 
+\item{stat_type}{Define the method for calculating the profile contact intensities.
+Either "linear" or "log", for arithmetic or geometric means, respectively. Default
 is "linear".}
 }
 \value{
@@ -36,6 +36,6 @@ Returns a p4cProfile object.
 \code{p4cNewProfile} constructs a p4cProfile object from a genomic 2D track.
 }
 \details{
-This function is the primary object constructor. It processes a 2D genomic track 
+This function is the primary object constructor. It processes a 2D genomic track
 with (UMI)-4C raw contact data and returns a p4cProfile object.
 }

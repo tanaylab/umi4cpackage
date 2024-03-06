@@ -40,12 +40,12 @@ The pipeline is designed to run on a standard linux machine. The basic requireme
 Install the r dependencies: 
 ```{r, eval=FALSE}
 # Install devtools if not installed
-if(!require(devtools)){
-  install.packages("devtools")
+if (!require(devtools)) {
+    install.packages("devtools")
 }
 # Install misha if not installed
-if(!require(misha)){
-  install.packages('misha', repos=c(getOption('repos'),       'https://tanaylab.github.io/repo'))
+if (!require(misha)) {
+    install.packages("misha", repos = c(getOption("repos"), "https://tanaylab.github.io/repo"))
 }
 ```
 Download and install _umi4cPackage_: 
@@ -139,7 +139,7 @@ gtrack.ls()
 Now we can analyze the data:  
 Suppose we want to create an UMI-4C profile 200kb upstream and downstream the bait in our exmaple CMK experiment. The first step is to create `p4cProfile object`:
 ```{r, eval=FALSE}
-CMK_fc <- p4cNewProfile("umi4C_example_CMK_ANK1_TSS", scope_5=200000, scope_3=200000)
+CMK_fc <- p4cNewProfile("umi4C_example_CMK_ANK1_TSS", scope_5 = 200000, scope_3 = 200000)
 ```
 
 Plot nearcis profile:
@@ -149,13 +149,13 @@ plot(CMK_fc)
 This command generates a plot of the 4C profile with a smoothed trend and a domainogram. It accepts some more parameters which are described in the function documentation: `?plot.p4cProfile`.  
 For example, if we want to save the domainogram to a png file we can do:
 ```{r, eval=FALSE}
-plot(CMK_fc, png_fn="figs/CMK_ANK1_TSS.png")
+plot(CMK_fc, png_fn = "figs/CMK_ANK1_TSS.png")
 ```
 
 #### Compare the profile to another profile
 To compare two 4C experiments, we first import two other profiles (notice, this time we will do it in batch):
 ```{r, eval=FALSE}
-p4cCreate4CseqTrack(sample_ids = c(2,3))
+p4cCreate4CseqTrack(sample_ids = c(2, 3))
 ```
 Two new tracks were created. To list the tracks again by `gtrack.ls()`.
 
@@ -164,7 +164,7 @@ After the tracks were imported we can produce comparative plots. For example, we
 which express _ANK1_ gene to _DND41_ which does not.
 ```{r, message=FALSE, eval=FALSE}
 # Generate a second p4cProfile on the same scope
-DND41_fc <- p4cNewProfile("umi4C_example_DND41_ANK1_TSS", scope_5=200000, scope_3=200000)
+DND41_fc <- p4cNewProfile("umi4C_example_DND41_ANK1_TSS", scope_5 = 200000, scope_3 = 200000)
 
 # plot a comparative plot
 plot(CMK_fc, DND41_fc)
@@ -173,6 +173,6 @@ plot(CMK_fc, DND41_fc)
 Additional feature is the ability to derive mean contact intensity for defined genomic intervals. The following command will return normalized contact intensities of the two profiles, fold change, 
 and p-value (Chi-square test)
 ```{r, message=FALSE, eval=FALSE}
-fold_change <- p4cIntervalsMean(CMK_fc, DND41_fc, start=41665000, end=41675000)
-knitr::kable(fold_change, align = 'l', digits=2)
+fold_change <- p4cIntervalsMean(CMK_fc, DND41_fc, start = 41665000, end = 41675000)
+knitr::kable(fold_change, align = "l", digits = 2)
 ```
